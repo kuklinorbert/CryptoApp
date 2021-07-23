@@ -42,3 +42,5 @@ class LoadingState extends AuthState {}
 class CodeVerifiedState extends AuthState {}
 
 class LoginSuccesfulState extends AuthState {}
+
+class NoResendLeftState extends AuthState {}

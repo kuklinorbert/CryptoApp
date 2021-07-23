@@ -5,6 +5,8 @@ import 'package:cryptoapp/core/error/failures.dart';
 import 'package:cryptoapp/core/usecases/usecase.dart';
 import 'package:cryptoapp/features/cryptoapp/domain/usecases/check_auth.dart';
 import 'package:cryptoapp/features/cryptoapp/domain/usecases/logout.dart';
+import 'package:cryptoapp/features/cryptoapp/domain/usecases/resend_code.dart'
+    as resend;
 import 'package:cryptoapp/features/cryptoapp/domain/usecases/send_code.dart';
 import 'package:cryptoapp/features/cryptoapp/domain/usecases/verify_code.dart'
     as verify;
@@ -21,22 +23,28 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final CheckAuth _checkAuth;
   final Logout _logout;
   final verify.VerifyCode _verifyCode;
+  final resend.ResendCode _resendCode;
 
   AuthBloc(
       {@required SendCode sendCode,
       @required CheckAuth checkAuth,
       @required verify.VerifyCode verifyCode,
-      @required Logout logout})
+      @required Logout logout,
+      @required resend.ResendCode resendCode})
       : assert(sendCode != null, checkAuth != null),
         _sendCode = sendCode,
         _checkAuth = checkAuth,
         _verifyCode = verifyCode,
         _logout = logout,
+        _resendCode = resendCode,
         super(AuthInitial());
 
   StreamSubscription subscription;
   String verID = "";
   bool secondPage = false;
+  int resendToken;
+  String resendPhone;
+  int resendTimes = 0;
 
   @override
   Stream<AuthState> mapEventToState(
@@ -47,6 +55,11 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       yield* _eitherAuthOrErrorState(result);
     } else if (event is SendCodeEvent) {
       subscription = sendCode(event.phoneNumber).listen((event) {
+        add(event);
+      });
+      yield LoadingState();
+    } else if (event is ResendCodeEvent) {
+      subscription = resendCode().listen((event) {
         add(event);
       });
       yield LoadingState();
@@ -81,6 +94,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       (failure) => ErrorLoggedState(message: _mapFailureToMessage(failure)),
       (logout) {
         secondPage = false;
+        resendTimes = 0;
         return Unauthenticated();
       },
     );
@@ -115,8 +129,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       eventStream.add(VerifyFailureEvent(message: authException.message));
       eventStream.close();
     };
-    final phoneCodeSent = (String verId, [int forceResent]) {
+    final phoneCodeSent = (String verId, int resendToken) {
+      this.resendToken = resendToken;
       this.verID = verId;
+      this.resendPhone = phoneNumber;
       eventStream.add(CodeSentEvent());
     };
     final phoneCodeAutoRetrievalTimeout = (String verid) {
@@ -131,6 +147,38 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         phoneVerificationCompleted: phoneVerificationCompleted,
         phoneCodeSent: phoneCodeSent,
         autoRetrievalTimeout: phoneCodeAutoRetrievalTimeout));
+
+    yield* eventStream.stream;
+  }
+
+  Stream<AuthEvent> resendCode() async* {
+    StreamController<AuthEvent> eventStream = StreamController();
+    final phoneVerificationCompleted = (AuthCredential authCredential) {
+      eventStream.add(AuthenticatedEvent());
+      eventStream.close();
+    };
+    final phoneVerificationFailed = (FirebaseAuthException authException) {
+      print(authException.message);
+      eventStream.add(VerifyFailureEvent(message: authException.message));
+      eventStream.close();
+    };
+    final phoneCodeSent = (String verId, int resendToken) {
+      this.verID = verId;
+      eventStream.add(CodeSentEvent());
+    };
+    final phoneCodeAutoRetrievalTimeout = (String verid) {
+      this.verID = verid;
+      eventStream.close();
+    };
+
+    await _resendCode.call(resend.Params(
+        phoneNumber: resendPhone,
+        timeOut: Duration(seconds: 30),
+        phoneVerificationFailed: phoneVerificationFailed,
+        phoneVerificationCompleted: phoneVerificationCompleted,
+        phoneCodeSent: phoneCodeSent,
+        autoRetrievalTimeout: phoneCodeAutoRetrievalTimeout,
+        forceResendingToken: resendToken));
 
     yield* eventStream.stream;
   }

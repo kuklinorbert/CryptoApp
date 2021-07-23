@@ -11,6 +11,15 @@ abstract class AuthRepository {
       PhoneCodeSent phoneCodeSent,
       PhoneCodeAutoRetrievalTimeout autoRetrievalTimeout);
 
+  Future<Either<Failure, void>> resendCode(
+      String phoneNumber,
+      Duration timeOut,
+      PhoneVerificationFailed phoneVerificationFailed,
+      PhoneVerificationCompleted phoneVerificationCompleted,
+      PhoneCodeSent phoneCodeSent,
+      PhoneCodeAutoRetrievalTimeout autoRetrievalTimeout,
+      int forceResendingToken);
+
   Future<Either<Failure, User>> checkAuth();
 
   Future<Either<Failure, UserCredential>> verifyCode(

@@ -22,6 +22,7 @@ class VerifyEvent extends AuthEvent {
 
   VerifyEvent({@required this.smsCode});
 
+  @override
   List<Object> get props => [smsCode];
 }
 
@@ -41,3 +42,5 @@ class VerifyFailureEvent extends AuthEvent {
 class CodeSentEvent extends AuthEvent {}
 
 class JumpBackEvent extends AuthEvent {}
+
+class ResendCodeEvent extends AuthEvent {}

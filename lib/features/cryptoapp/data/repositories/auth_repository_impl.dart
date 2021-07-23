@@ -46,6 +46,30 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
+  Future<Either<Failure, void>> resendCode(
+      String phoneNumber,
+      Duration timeOut,
+      PhoneVerificationFailed phoneVerificationFailed,
+      PhoneVerificationCompleted phoneVerificationCompleted,
+      PhoneCodeSent phoneCodeSent,
+      PhoneCodeAutoRetrievalTimeout autoRetrievalTimeout,
+      int forceResendingToken) async {
+    try {
+      final result = _firebaseAuth.verifyPhoneNumber(
+          phoneNumber: "+" + phoneNumber,
+          timeout: timeOut,
+          verificationCompleted: phoneVerificationCompleted,
+          verificationFailed: phoneVerificationFailed,
+          codeSent: phoneCodeSent,
+          codeAutoRetrievalTimeout: autoRetrievalTimeout,
+          forceResendingToken: forceResendingToken);
+      return Right(result);
+    } catch (e) {
+      return Left(CodeSendFailure());
+    }
+  }
+
+  @override
   Future<Either<Failure, UserCredential>> verifyCode(
       String verificationId, String smsCode) async {
     try {

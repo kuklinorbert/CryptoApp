@@ -18,6 +18,7 @@ class _AuthPageState extends State<AuthPage> {
   int phoneNumber;
   String smsCode;
   AuthBloc authBloc;
+  int resendTimes = 0;
 
   @override
   void initState() {
@@ -42,6 +43,8 @@ class _AuthPageState extends State<AuthPage> {
           authBloc.add(JumpBackEvent());
           ScaffoldMessenger.of(context)
               .showSnackBar(buildSnackBar(context, state.message));
+        } else if (state is Unauthenticated) {
+          resendTimes = 0;
         }
       },
       child: BlocBuilder(
@@ -96,7 +99,25 @@ class _AuthPageState extends State<AuthPage> {
                         authBloc.add(VerifyEvent(smsCode: smsCode));
                         //Bloc
                       },
-                      child: Text('Verify'))
+                      child: Text('Verify')),
+                  ElevatedButton(
+                      onPressed: (resendTimes >= 3)
+                          ? null
+                          : () {
+                              print(resendTimes);
+                              resendTimes++;
+                              authBloc.add(ResendCodeEvent());
+                            },
+                      // onPressed: () {
+                      //   resendTimes++;
+                      //   if (resendTimes == 3) {
+                      //     return null;
+                      //   } else {
+                      //     authBloc.add(ResendCodeEvent());
+                      //   }
+                      //   //Bloc
+                      // },
+                      child: Text('Resend Code'))
                 ]);
           } else if (state is LoadingState) {
             return Center(
