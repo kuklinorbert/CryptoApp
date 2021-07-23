@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "224234880365",
+    "project_id": "cryptoapp-582a9",
+    "storage_bucket": "cryptoapp-582a9.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:224234880365:android:2c91f863bb0b97be456e64",
+        "android_client_info": {
+          "package_name": "com.example.cryptoapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "224234880365-fbpnf60vpit0k7q28p4u5692mqfs3bn9.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.cryptoapp",
+            "certificate_hash": "b164f2c2db27ca8d7e10a2977a23b225de5ec33e"
+          }
+        },
+        {
+          "client_id": "224234880365-1fvipqgjksljkuisp7g7ifsbkl3c6ki8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBIlS5u5qQ2LSRogVXROUQLhNsWUZ0O3Hw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "224234880365-1fvipqgjksljkuisp7g7ifsbkl3c6ki8.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
