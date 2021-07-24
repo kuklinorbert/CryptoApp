@@ -28,6 +28,8 @@ dependencies:
   equatable: ^2.0.3
   get_it: ^5.0.6
   dartz: ^0.9.2
+  data_connection_checker: ^0.3.4
+  pinput: ^1.2.0
 
 
 

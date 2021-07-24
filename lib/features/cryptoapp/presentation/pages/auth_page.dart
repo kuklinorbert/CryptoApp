@@ -1,9 +1,11 @@
-import 'package:cryptoapp/features/cryptoapp/domain/usecases/check_auth.dart';
+import 'dart:ui';
+
 import 'package:cryptoapp/features/cryptoapp/presentation/bloc/auth/auth_bloc.dart';
 import 'package:cryptoapp/features/cryptoapp/presentation/widgets/show_snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:pinput/pin_put/pin_put.dart';
 
 import '../../../../injection_container.dart';
 
@@ -58,67 +60,131 @@ class _AuthPageState extends State<AuthPage> {
         },
         builder: (context, state) {
           if (state is AuthInitial || state is Unauthenticated) {
-            return Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text('You must verify your phone number'),
-                  TextFormField(
-                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                    keyboardType: TextInputType.number,
-                    onChanged: (String value) {
-                      phoneNumber = int.parse(value);
-                    },
-                    onSaved: (String value) {
-                      phoneNumber = int.parse(value);
-                    },
-                  ),
-                  ElevatedButton(
-                      onPressed: () {
-                        authBloc.add(
-                            SendCodeEvent(phoneNumber: phoneNumber.toString()));
-                      },
-                      child: Text('Send code'))
-                ]);
+            return Center(
+              child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'You must verify your phone number',
+                      style: TextStyle(fontSize: 20),
+                    ),
+                    SizedBox(height: 40),
+                    SizedBox(
+                      width: MediaQuery.of(context).size.width * 0.8,
+                      child: TextFormField(
+                        style: TextStyle(
+                            fontSize: 17, fontWeight: FontWeight.w400),
+                        decoration: InputDecoration(
+                            filled: true,
+                            prefix: Text('+'),
+                            border: OutlineInputBorder()),
+                        inputFormatters: [
+                          FilteringTextInputFormatter.digitsOnly
+                        ],
+                        keyboardType: TextInputType.number,
+                        onChanged: (String value) {
+                          phoneNumber = int.parse(value);
+                        },
+                        onSaved: (String value) {
+                          phoneNumber = int.parse(value);
+                        },
+                      ),
+                    ),
+                    SizedBox(
+                      height: 30,
+                    ),
+                    ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                            shape: new RoundedRectangleBorder(
+                                borderRadius: new BorderRadius.circular(30.0)),
+                            primary: Colors.white,
+                            side: BorderSide(color: Colors.blue)),
+                        onPressed: () {
+                          authBloc.add(SendCodeEvent(
+                              phoneNumber: phoneNumber.toString()));
+                        },
+                        child: Text(
+                          'Send code',
+                          style: TextStyle(color: Colors.blue, fontSize: 18),
+                        ))
+                  ]),
+            );
           } else if (state is CodeSentState) {
-            return Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text('You must enter the code from the SMS'),
-                  TextFormField(
-                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                    keyboardType: TextInputType.number,
-                    onChanged: (String value) {
-                      smsCode = value;
-                    },
-                    onSaved: (String value) {
-                      smsCode = value;
-                    },
-                  ),
-                  ElevatedButton(
-                      onPressed: () {
-                        authBloc.add(VerifyEvent(smsCode: smsCode));
-                        //Bloc
-                      },
-                      child: Text('Verify')),
-                  ElevatedButton(
-                      onPressed: (resendTimes >= 3)
-                          ? null
-                          : () {
-                              print(resendTimes);
-                              resendTimes++;
-                              authBloc.add(ResendCodeEvent());
-                            },
-                      // onPressed: () {
-                      //   resendTimes++;
-                      //   if (resendTimes == 3) {
-                      //     return null;
-                      //   } else {
-                      //     authBloc.add(ResendCodeEvent());
-                      //   }
-                      //   //Bloc
-                      // },
-                      child: Text('Resend Code'))
-                ]);
+            return Center(
+              child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text('Enter the code from the SMS',
+                        style: TextStyle(fontSize: 20)),
+                    SizedBox(height: 40),
+                    SizedBox(
+                        width: MediaQuery.of(context).size.width * 0.8,
+                        child: PinPut(
+                          textStyle: TextStyle(
+                              fontSize: 17, fontWeight: FontWeight.bold),
+                          fieldsCount: 6,
+                          eachFieldWidth:
+                              MediaQuery.of(context).size.width * 0.1,
+                          selectedFieldDecoration: BoxDecoration(
+                              border: Border.all(color: Colors.blue),
+                              borderRadius: BorderRadius.circular(10.0),
+                              color: Colors.grey[200]),
+                          followingFieldDecoration: BoxDecoration(
+                              border: Border.all(color: Colors.blue),
+                              borderRadius: BorderRadius.circular(10.0),
+                              color: Colors.grey[200]),
+                          submittedFieldDecoration: BoxDecoration(
+                              border: Border.all(color: Colors.blue),
+                              borderRadius: BorderRadius.circular(10.0)),
+                          onChanged: (String value) {
+                            smsCode = value;
+                          },
+                          onSaved: (String value) {
+                            smsCode = value;
+                          },
+                        )),
+                    SizedBox(
+                      height: 30,
+                    ),
+                    ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                            shape: new RoundedRectangleBorder(
+                                borderRadius: new BorderRadius.circular(30.0)),
+                            primary: Colors.white,
+                            side: BorderSide(color: Colors.blue)),
+                        onPressed: () {
+                          authBloc.add(VerifyEvent(smsCode: smsCode));
+                          //Bloc
+                        },
+                        child: Text('Verify',
+                            style:
+                                TextStyle(color: Colors.blue, fontSize: 18))),
+                    TextButton.icon(
+                        icon: Icon(
+                          Icons.refresh,
+                        ),
+                        style: ButtonStyle(
+                          foregroundColor:
+                              MaterialStateProperty.resolveWith<Color>(
+                            (Set<MaterialState> states) =>
+                                states.contains(MaterialState.disabled)
+                                    ? Colors.grey
+                                    : Colors.purple,
+                          ),
+                        ),
+                        onPressed: (resendTimes >= 3)
+                            ? null
+                            : () {
+                                print(resendTimes);
+                                resendTimes++;
+                                authBloc.add(ResendCodeEvent());
+                              },
+                        label: Text(
+                          'Resend Code',
+                          style: TextStyle(fontSize: 16),
+                        ))
+                  ]),
+            );
           } else if (state is LoadingState) {
             return Center(
               child: CircularProgressIndicator(),

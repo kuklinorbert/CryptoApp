@@ -1,3 +1,4 @@
+import 'package:cryptoapp/core/network/network_info.dart';
 import 'package:cryptoapp/features/cryptoapp/data/repositories/auth_repository_impl.dart';
 import 'package:cryptoapp/features/cryptoapp/domain/repositories/auth_repository.dart';
 import 'package:cryptoapp/features/cryptoapp/domain/usecases/check_auth.dart';
@@ -6,6 +7,7 @@ import 'package:cryptoapp/features/cryptoapp/domain/usecases/resend_code.dart';
 import 'package:cryptoapp/features/cryptoapp/domain/usecases/send_code.dart';
 import 'package:cryptoapp/features/cryptoapp/domain/usecases/verify_code.dart';
 import 'package:cryptoapp/features/cryptoapp/presentation/bloc/auth/auth_bloc.dart';
+import 'package:data_connection_checker/data_connection_checker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get_it/get_it.dart';
 
@@ -27,11 +29,13 @@ Future<void> init() async {
   sl.registerLazySingleton(() => Logout(sl()));
   sl.registerLazySingleton(() => ResendCode(sl()));
   //Repository
-  sl.registerLazySingleton<AuthRepository>(() => AuthRepositoryImpl());
+  sl.registerLazySingleton<AuthRepository>(
+      () => AuthRepositoryImpl(networkInfo: sl()));
   //Data sources
 
   //Core
-
+  sl.registerLazySingleton<NetworkInfo>(() => NetworkInfoImpl(sl()));
   //External
   sl.registerLazySingleton(() => FirebaseAuth.instance);
+  sl.registerLazySingleton(() => DataConnectionChecker());
 }
