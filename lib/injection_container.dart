@@ -7,6 +7,7 @@ import 'package:cryptoapp/features/cryptoapp/domain/usecases/resend_code.dart';
 import 'package:cryptoapp/features/cryptoapp/domain/usecases/send_code.dart';
 import 'package:cryptoapp/features/cryptoapp/domain/usecases/verify_code.dart';
 import 'package:cryptoapp/features/cryptoapp/presentation/bloc/auth/auth_bloc.dart';
+import 'package:cryptoapp/features/cryptoapp/presentation/bloc/navigationbar/navigationbar_bloc.dart';
 import 'package:data_connection_checker/data_connection_checker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get_it/get_it.dart';
@@ -21,6 +22,8 @@ Future<void> init() async {
       verifyCode: sl(),
       logout: sl(),
       resendCode: sl()));
+
+  sl.registerLazySingleton(() => NavigationbarBloc());
 
   //Use cases
   sl.registerLazySingleton(() => SendCode(sl()));
