@@ -31,6 +31,8 @@ dependencies:
   data_connection_checker: ^0.3.4
   pinput: ^1.2.0
   http: ^0.13.3
+  flutter_linkify: ^5.0.2
+  url_launcher: ^6.0.9
 
 
 

@@ -62,7 +62,10 @@ Scaffold buildEventsPage(AuthBloc authBloc, NavigationbarBloc navbarBloc) {
                     itemBuilder: (_, i) {
                       return Card(
                           child: InkWell(
-                        onTap: () {},
+                        onTap: () {
+                          Navigator.of(context).pushNamed('/eventdetails',
+                              arguments: state.event.data[i]);
+                        },
                         child: (SizedBox(
                           height: MediaQuery.of(context).size.height * 0.3,
                           width: MediaQuery.of(context).size.width,
@@ -73,7 +76,6 @@ Scaffold buildEventsPage(AuthBloc authBloc, NavigationbarBloc navbarBloc) {
                                   state.event.data[i].screenshot,
                                   height:
                                       MediaQuery.of(context).size.height * 0.22,
-                                  //width: MediaQuery.of(context).size.width,
                                   fit: BoxFit.fill,
                                 ),
                                 SizedBox(
@@ -94,15 +96,21 @@ Scaffold buildEventsPage(AuthBloc authBloc, NavigationbarBloc navbarBloc) {
                                     Padding(
                                       padding:
                                           const EdgeInsets.only(right: 8.0),
-                                      child: Text(
-                                        state.event.data[i].startDate
-                                            .toString()
-                                            .substring(0, 10),
-                                        style: TextStyle(
-                                            fontSize: 15,
-                                            fontWeight: FontWeight.w500,
-                                            color: Colors.blue),
-                                      ),
+                                      child: Row(children: [
+                                        Icon(
+                                          Icons.event,
+                                          color: Colors.blue,
+                                        ),
+                                        Text(
+                                          state.event.data[i].startDate
+                                              .toString()
+                                              .substring(0, 10),
+                                          style: TextStyle(
+                                              fontSize: 15,
+                                              fontWeight: FontWeight.w500,
+                                              color: Colors.blue),
+                                        ),
+                                      ]),
                                     )
                                   ],
                                 ),
