@@ -16,3 +16,5 @@ class LogoutFailure extends Failure {}
 class VerifyFailure extends Failure {}
 
 class NetworkFailure extends Failure {}
+
+class ServerFailure extends Failure {}
