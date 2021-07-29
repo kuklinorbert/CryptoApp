@@ -46,4 +46,18 @@ class ItemsRepositoryImpl implements ItemsRepository {
       return Left(ServerFailure());
     }
   }
+
+  @override
+  Future<Either<Failure, List<Items>>> refreshItems(int page) async {
+    if (await networkInfo.isConnected) {
+      try {
+        final result = await itemsDataSource.refreshItems(page);
+        return Right(result);
+      } on ServerException {
+        return Left(ServerFailure());
+      }
+    } else {
+      return Left(ServerFailure());
+    }
+  }
 }

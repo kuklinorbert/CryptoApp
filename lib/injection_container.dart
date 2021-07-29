@@ -24,6 +24,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get_it/get_it.dart';
 import 'package:http/http.dart' as http;
 
+import 'features/cryptoapp/domain/usecases/refresh_items.dart';
+
 final sl = GetIt.instance;
 
 Future<void> init() async {
@@ -39,8 +41,8 @@ Future<void> init() async {
 
   sl.registerLazySingleton(() => EventsBloc(getEvents: sl()));
 
-  sl.registerLazySingleton(
-      () => ItemsBloc(getItems: sl(), getSearchResult: sl()));
+  sl.registerLazySingleton(() =>
+      ItemsBloc(getItems: sl(), getSearchResult: sl(), refreshItems: sl()));
 
   //Use cases
   sl.registerLazySingleton(() => SendCode(sl()));
@@ -51,6 +53,7 @@ Future<void> init() async {
   sl.registerLazySingleton(() => GetEvents(sl()));
   sl.registerLazySingleton(() => GetItems(sl()));
   sl.registerLazySingleton(() => GetSearchResult(sl()));
+  sl.registerLazySingleton(() => RefreshItems(sl()));
 
   //Repository
   sl.registerLazySingleton<AuthRepository>(

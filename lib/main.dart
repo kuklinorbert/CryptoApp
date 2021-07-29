@@ -6,6 +6,7 @@ import 'package:cryptoapp/injection_container.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'features/cryptoapp/domain/usecases/get_items.dart';
+import 'features/cryptoapp/domain/usecases/refresh_items.dart';
 import 'features/cryptoapp/presentation/bloc/items/items_bloc.dart';
 import 'injection_container.dart' as di;
 import 'package:firebase_core/firebase_core.dart';
@@ -23,7 +24,9 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
         create: (BuildContext context) => ItemsBloc(
-            getItems: sl<GetItems>(), getSearchResult: sl<GetSearchResult>())
+            getItems: sl<GetItems>(),
+            getSearchResult: sl<GetSearchResult>(),
+            refreshItems: sl<RefreshItems>())
           ..add(GetItemsEvent()),
         child: MaterialApp(
             title: 'CryptoApp',

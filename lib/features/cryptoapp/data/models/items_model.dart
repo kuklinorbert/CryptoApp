@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:cryptoapp/features/cryptoapp/data/models/items_interval_model.dart';
 import 'package:cryptoapp/features/cryptoapp/domain/entities/items.dart';
 import 'package:meta/meta.dart';

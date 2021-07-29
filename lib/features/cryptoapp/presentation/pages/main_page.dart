@@ -64,7 +64,7 @@ Scaffold buildHomePage(
     ItemsBloc itemsBloc,
     BuildContext context,
     TextEditingController _textController) {
-  final List<Items> _items = [];
+  List<Items> _items = [];
   final ScrollController _scrollController = ScrollController();
 
   return Scaffold(
@@ -138,64 +138,65 @@ Scaffold buildHomePage(
         Expanded(
           child: BlocConsumer<ItemsBloc, ItemsState>(
               listener: (context, state) {},
-              buildWhen: (previous, current) {
-                if (previous is LoadedItems && current is LoadedItems) {
-                  return false;
-                } else {
-                  return true;
-                }
-              },
               builder: (context, state) {
+                print(state);
                 if (state is LoadingItems && _items.isEmpty ||
                     state is LoadingSearchResult) {
                   return Center(child: CircularProgressIndicator());
                 } else if (state is LoadedItems) {
-                  _items.addAll(state.items);
+                  _items = state.items;
                   itemsBloc.isFetching = false;
                 } else if (state is LoadedSearchItem) {
                   return Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: ListView.separated(
-                        itemBuilder: (context, index) {
-                          return CryptoItem(state.searchedItem[index]);
-                        },
-                        separatorBuilder: (context, index) =>
-                            const SizedBox(height: 10),
-                        itemCount: state.searchedItem.length),
+                    child: RefreshIndicator(
+                      onRefresh: () async {
+                        BlocProvider.of<ItemsBloc>(context)
+                          ..add(RefreshSearchEvent());
+                      },
+                      child: ListView.separated(
+                          physics: AlwaysScrollableScrollPhysics(),
+                          itemBuilder: (context, index) {
+                            return CryptoItem(state.searchedItem[index]);
+                          },
+                          separatorBuilder: (context, index) =>
+                              const SizedBox(height: 10),
+                          itemCount: state.searchedItem.length),
+                    ),
                   );
                 } else if (state is ErrorItems && _items.isEmpty) {
                   return Center(
                     child: Text('Error loading items'),
                   );
                 }
-                return Column(
-                  children: [
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.all(8),
-                        child: ListView.separated(
-                            controller: _scrollController
-                              ..addListener(() {
-                                if (_scrollController.offset ==
-                                        _scrollController
-                                            .position.maxScrollExtent &&
-                                    !itemsBloc.isFetching) {
-                                  BlocProvider.of<ItemsBloc>(context)
-                                      .add(GetItemsEvent());
-                                  itemsBloc.isFetching = true;
-                                }
-                              }),
-                            itemBuilder: (context, index) {
-                              return index >= _items.length - 1
-                                  ? Center(child: CircularProgressIndicator())
-                                  : CryptoItem(_items[index]);
-                            },
-                            separatorBuilder: (context, index) =>
-                                const SizedBox(height: 10),
-                            itemCount: _items.length),
-                      ),
-                    ),
-                  ],
+                return RefreshIndicator(
+                  onRefresh: () async {
+                    BlocProvider.of<ItemsBloc>(context)
+                      ..add(RefreshItemsEvent());
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.all(8),
+                    child: ListView.separated(
+                        controller: _scrollController
+                          ..addListener(() {
+                            if (_scrollController.offset ==
+                                    _scrollController
+                                        .position.maxScrollExtent &&
+                                !itemsBloc.isFetching) {
+                              BlocProvider.of<ItemsBloc>(context)
+                                  .add(GetItemsEvent());
+                              itemsBloc.isFetching = true;
+                            }
+                          }),
+                        itemBuilder: (context, index) {
+                          return index >= _items.length - 1
+                              ? Center(child: CircularProgressIndicator())
+                              : CryptoItem(_items[index]);
+                        },
+                        separatorBuilder: (context, index) =>
+                            const SizedBox(height: 10),
+                        itemCount: _items.length),
+                  ),
                 );
               }),
         ),

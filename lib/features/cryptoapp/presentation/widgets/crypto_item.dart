@@ -40,7 +40,7 @@ class CryptoItem extends StatelessWidget {
               SizedBox(
                 width: 15,
               ),
-              Text(item.price)
+              Text(num.parse(item.price).toStringAsFixed(3) + " \$")
             ],
           ),
         ),

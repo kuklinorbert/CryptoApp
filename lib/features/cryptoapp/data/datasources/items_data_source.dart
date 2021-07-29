@@ -6,11 +6,13 @@ import 'package:http/http.dart' as http;
 abstract class ItemsDataSource {
   Future<List<ItemsModel>> getItems(int page);
   Future<List<ItemsModel>> getSearchResult(String searchText);
+  Future<List<ItemsModel>> refreshItems(int page);
 }
 
 class ItemsDataSourceImpl implements ItemsDataSource {
   final http.Client client;
   final int perPage = 10;
+  int refreshCount;
 
   ItemsDataSourceImpl({@required this.client});
 
@@ -35,5 +37,12 @@ class ItemsDataSourceImpl implements ItemsDataSource {
     searchText = searchText.replaceAll(" ", "");
     return _getItemsFromUrl(
         'https://api.nomics.com/v1/currencies/ticker?key=9b477e525212e4d0ae32ca7dd6f17f9d3e1e4c95&ids=$searchText');
+  }
+
+  @override
+  Future<List<ItemsModel>> refreshItems(int page) {
+    (page > 3) ? refreshCount = 30 : refreshCount = page * 10;
+    return _getItemsFromUrl(
+        'https://api.nomics.com/v1/currencies/ticker?key=9b477e525212e4d0ae32ca7dd6f17f9d3e1e4c95&sort=rank&per-page=$refreshCount');
   }
 }

@@ -6,6 +6,8 @@ import 'package:cryptoapp/features/cryptoapp/domain/usecases/get_items.dart'
     as items;
 import 'package:cryptoapp/features/cryptoapp/domain/usecases/get_search_result.dart'
     as search;
+import 'package:cryptoapp/features/cryptoapp/domain/usecases/refresh_items.dart'
+    as refresh;
 import 'package:dartz/dartz.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/cupertino.dart';
@@ -17,16 +19,20 @@ part 'items_state.dart';
 class ItemsBloc extends Bloc<ItemsEvent, ItemsState> {
   final items.GetItems _getItems;
   final search.GetSearchResult _getSearchResult;
+  final refresh.RefreshItems _refreshItems;
   int page = 1;
   bool isFetching = false;
   List<Items> itemList = [];
+  String lastSearch;
 
   ItemsBloc(
       {@required items.GetItems getItems,
-      @required search.GetSearchResult getSearchResult})
+      @required search.GetSearchResult getSearchResult,
+      @required refresh.RefreshItems refreshItems})
       : assert(getItems != null, getSearchResult != null),
         _getItems = getItems,
         _getSearchResult = getSearchResult,
+        _refreshItems = refreshItems,
         super(ItemsInitial());
 
   @override
@@ -40,6 +46,7 @@ class ItemsBloc extends Bloc<ItemsEvent, ItemsState> {
     }
     if (event is GetSearchedItemEvent) {
       yield LoadingSearchResult();
+      lastSearch = event.searchText;
       final failureOrSearchResult = await _getSearchResult
           .call(search.Params(searchText: event.searchText));
       yield* _eitherSearchResultOrErrorState(failureOrSearchResult);
@@ -47,6 +54,30 @@ class ItemsBloc extends Bloc<ItemsEvent, ItemsState> {
     if (event is CancelSearchEvent) {
       yield LoadedItems(items: itemList);
     }
+    if (event is RefreshSearchEvent) {
+      yield LoadingSearchResult();
+      final failureOrSearchResult =
+          await _getSearchResult.call(search.Params(searchText: lastSearch));
+      yield* _eitherSearchResultOrErrorState(failureOrSearchResult);
+    }
+    if (event is RefreshItemsEvent) {
+      yield LoadingSearchResult();
+      final failureOrItems =
+          await _refreshItems.call(refresh.Params(page: page));
+      yield* _eitherRefreshOrErrorState(failureOrItems);
+    }
+  }
+
+  Stream<ItemsState> _eitherRefreshOrErrorState(
+    Either<Failure, List<Items>> failureOrItem,
+  ) async* {
+    yield failureOrItem.fold(
+      (failure) => ErrorItems(message: _mapFailureToMessage(failure)),
+      (items) {
+        itemList = items;
+        return LoadedItems(items: itemList);
+      },
+    );
   }
 
   Stream<ItemsState> _eitherSearchResultOrErrorState(

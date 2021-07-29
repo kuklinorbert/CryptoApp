@@ -5,4 +5,5 @@ import 'package:dartz/dartz.dart';
 abstract class ItemsRepository {
   Future<Either<Failure, List<Items>>> getItems(int page);
   Future<Either<Failure, List<Items>>> getSearchResult(String searchText);
+  Future<Either<Failure, List<Items>>> refreshItems(int page);
 }

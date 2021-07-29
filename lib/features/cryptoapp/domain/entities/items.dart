@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:cryptoapp/features/cryptoapp/domain/entities/items_interval.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
@@ -64,7 +66,6 @@ class Items extends Equatable {
   final ItemsInterval ytd;
 
   @override
-  // TODO: implement props
   List<Object> get props => [
         id,
         currency,

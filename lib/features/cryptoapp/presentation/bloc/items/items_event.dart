@@ -19,3 +19,7 @@ class GetSearchedItemEvent extends ItemsEvent {
 }
 
 class CancelSearchEvent extends ItemsEvent {}
+
+class RefreshSearchEvent extends ItemsEvent {}
+
+class RefreshItemsEvent extends ItemsEvent {}
