@@ -25,7 +25,7 @@ class EventsBloc extends Bloc<EventsEvent, EventsState> {
     EventsEvent event,
   ) async* {
     if (event is GetEventsEvent) {
-      yield Loading();
+      yield LoadingEvents();
       final failureOrEvents = await _getEvents.call(NoParams());
       yield* _eitherLoadedOrErrorState(failureOrEvents);
     }
@@ -35,8 +35,8 @@ class EventsBloc extends Bloc<EventsEvent, EventsState> {
     Either<Failure, Events> failureOrItem,
   ) async* {
     yield failureOrItem.fold(
-      (failure) => Error(message: _mapFailureToMessage(failure)),
-      (event) => Loaded(event: event),
+      (failure) => ErrorEvents(message: _mapFailureToMessage(failure)),
+      (event) => LoadedEvents(event: event),
     );
   }
 

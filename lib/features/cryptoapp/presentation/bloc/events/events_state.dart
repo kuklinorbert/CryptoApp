@@ -9,21 +9,21 @@ abstract class EventsState extends Equatable {
 
 class EventsInitial extends EventsState {}
 
-class Loading extends EventsState {}
+class LoadingEvents extends EventsState {}
 
-class Loaded extends EventsState {
+class LoadedEvents extends EventsState {
   final Events event;
 
-  Loaded({@required this.event});
+  LoadedEvents({@required this.event});
 
   @override
   List<Object> get props => [event];
 }
 
-class Error extends EventsState {
+class ErrorEvents extends EventsState {
   final String message;
 
-  Error({@required this.message});
+  ErrorEvents({@required this.message});
 
   @override
   List<Object> get props => [message];

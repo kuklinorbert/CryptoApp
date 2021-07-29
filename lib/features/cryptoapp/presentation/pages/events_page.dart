@@ -38,7 +38,7 @@ Scaffold buildEventsPage(AuthBloc authBloc, NavigationbarBloc navbarBloc) {
         child: BlocBuilder<EventsBloc, EventsState>(
             bloc: sl<EventsBloc>()..add(GetEventsEvent()),
             buildWhen: (previous, current) {
-              if (previous is Loaded) {
+              if (previous is LoadedEvents) {
                 return false;
               } else {
                 return true;
@@ -52,11 +52,11 @@ Scaffold buildEventsPage(AuthBloc authBloc, NavigationbarBloc navbarBloc) {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [Text('Events')]),
                 );
-              } else if (state is Loading) {
+              } else if (state is LoadingEvents) {
                 return Center(
                   child: CircularProgressIndicator(),
                 );
-              } else if (state is Loaded) {
+              } else if (state is LoadedEvents) {
                 return ListView.builder(
                     itemCount: state.event.count,
                     itemBuilder: (_, i) {
