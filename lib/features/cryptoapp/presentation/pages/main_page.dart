@@ -1,5 +1,4 @@
 import 'package:cryptoapp/features/cryptoapp/domain/entities/items.dart';
-import 'package:cryptoapp/features/cryptoapp/domain/usecases/get_items.dart';
 import 'package:cryptoapp/features/cryptoapp/presentation/bloc/auth/auth_bloc.dart';
 import 'package:cryptoapp/features/cryptoapp/presentation/bloc/items/items_bloc.dart';
 import 'package:cryptoapp/features/cryptoapp/presentation/bloc/navigationbar/navigationbar_bloc.dart';
@@ -9,7 +8,6 @@ import 'package:cryptoapp/features/cryptoapp/presentation/widgets/crypto_item.da
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../injection_container.dart';
 
@@ -24,6 +22,7 @@ class _MainPageState extends State<MainPage> {
   AuthBloc authBloc;
   NavigationbarBloc navbarBloc;
   ItemsBloc itemsBloc;
+  final TextEditingController _textController = TextEditingController();
 
   @override
   void initState() {
@@ -35,11 +34,19 @@ class _MainPageState extends State<MainPage> {
 
   @override
   Widget build(BuildContext context) {
+    _textController.addListener(() {
+      setState(() {});
+    });
+
     return BlocBuilder(
         bloc: navbarBloc,
         builder: (context, state) {
           if (state is NavigationbarHome || state is NavigationbarInitial) {
-            return buildHomePage(authBloc, navbarBloc, itemsBloc);
+            return GestureDetector(
+              onTap: () => FocusScope.of(context).unfocus(),
+              child: buildHomePage(
+                  authBloc, navbarBloc, itemsBloc, context, _textController),
+            );
           } else if (state is NavigationbarFavourites) {
             return buildFavouritesPage(authBloc, navbarBloc);
           } else if (state is NavigationbarEvents) {
@@ -52,7 +59,11 @@ class _MainPageState extends State<MainPage> {
 }
 
 Scaffold buildHomePage(
-    AuthBloc authBloc, NavigationbarBloc navbarBloc, ItemsBloc itemsBloc) {
+    AuthBloc authBloc,
+    NavigationbarBloc navbarBloc,
+    ItemsBloc itemsBloc,
+    BuildContext context,
+    TextEditingController _textController) {
   final List<Items> _items = [];
   final ScrollController _scrollController = ScrollController();
 
@@ -87,29 +98,71 @@ Scaffold buildHomePage(
         Padding(
           padding: const EdgeInsets.all(10.0),
           child: Row(children: [
-            Flexible(child: TextField()),
+            Flexible(
+                child: TextField(
+              controller: _textController,
+              decoration: InputDecoration(
+                  labelText: 'Search Text',
+                  suffixIcon: _textController.text.length > 0
+                      ? IconButton(
+                          onPressed: () {
+                            _textController.clear();
+                            BlocProvider.of<ItemsBloc>(context)
+                              ..add(CancelSearchEvent());
+                            Future.delayed(Duration.zero, () {
+                              FocusScope.of(context).unfocus();
+                            });
+                          },
+                          icon: Icon(Icons.cancel, color: Colors.grey))
+                      : null),
+              onChanged: (value) {
+                if (value.isEmpty) {
+                  BlocProvider.of<ItemsBloc>(context)..add(CancelSearchEvent());
+                  FocusScope.of(context).unfocus();
+                }
+              },
+              onSubmitted: (value) {
+                BlocProvider.of<ItemsBloc>(context)
+                  ..add(GetSearchedItemEvent(searchText: value));
+              },
+            )),
             IconButton(icon: Icon(Icons.sort), onPressed: () {}),
             IconButton(
               icon: Icon(Icons.attach_money),
               onPressed: () {},
             ),
             IconButton(
-                icon: Icon(Icons.local_fire_department),
-                onPressed: () {
-                  itemsBloc..add(GetItemsEvent());
-                }),
+                icon: Icon(Icons.local_fire_department), onPressed: () {}),
           ]),
         ),
         Expanded(
           child: BlocConsumer<ItemsBloc, ItemsState>(
               listener: (context, state) {},
+              buildWhen: (previous, current) {
+                if (previous is LoadedItems && current is LoadedItems) {
+                  return false;
+                } else {
+                  return true;
+                }
+              },
               builder: (context, state) {
-                if (state is ItemsInitial ||
-                    state is LoadingItems && _items.isEmpty) {
+                if (state is LoadingItems && _items.isEmpty ||
+                    state is LoadingSearchResult) {
                   return Center(child: CircularProgressIndicator());
                 } else if (state is LoadedItems) {
                   _items.addAll(state.items);
                   itemsBloc.isFetching = false;
+                } else if (state is LoadedSearchItem) {
+                  return Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: ListView.separated(
+                        itemBuilder: (context, index) {
+                          return CryptoItem(state.searchedItem[index]);
+                        },
+                        separatorBuilder: (context, index) =>
+                            const SizedBox(height: 10),
+                        itemCount: state.searchedItem.length),
+                  );
                 } else if (state is ErrorItems && _items.isEmpty) {
                   return Center(
                     child: Text('Error loading items'),
@@ -121,7 +174,6 @@ Scaffold buildHomePage(
                       child: Padding(
                         padding: const EdgeInsets.all(8),
                         child: ListView.separated(
-                            shrinkWrap: true,
                             controller: _scrollController
                               ..addListener(() {
                                 if (_scrollController.offset ==
@@ -138,8 +190,6 @@ Scaffold buildHomePage(
                                   ? Center(child: CircularProgressIndicator())
                                   : CryptoItem(_items[index]);
                             },
-                            // itemBuilder: (context, index) =>
-                            //     CryptoItem(_items[index]),
                             separatorBuilder: (context, index) =>
                                 const SizedBox(height: 10),
                             itemCount: _items.length),
@@ -149,30 +199,6 @@ Scaffold buildHomePage(
                 );
               }),
         ),
-        // BlocBuilder<ItemsBloc, ItemsState>(
-        //     bloc: itemsBloc..add(GetItemsEvent()),
-        //     buildWhen: (previous, current) {
-        //       if (previous is LoadedItems) {
-        //         return false;
-        //       } else {
-        //         return true;
-        //       }
-        //     },
-        //     builder: (context, state) {
-        //       if (state is ItemsInitial) {
-        //         return Center(child: Text('Items'));
-        //       } else if (state is LoadingItems) {
-        //         return Center(
-        //           child: CircularProgressIndicator(),
-        //         );
-        //       } else if (state is LoadedItems) {
-        //         return Center(
-        //           child: Text(state.items[0].name),
-        //         );
-        //       } else {
-        //         return Container();
-        //       }
-        //     }),
       ]),
     ),
     bottomNavigationBar: BottomNavigationBar(

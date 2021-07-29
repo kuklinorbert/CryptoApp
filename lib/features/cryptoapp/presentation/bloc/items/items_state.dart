@@ -28,3 +28,14 @@ class ErrorItems extends ItemsState {
   @override
   List<Object> get props => [message];
 }
+
+class LoadingSearchResult extends ItemsState {}
+
+class LoadedSearchItem extends ItemsState {
+  final List<Items> searchedItem;
+
+  LoadedSearchItem({@required this.searchedItem});
+
+  @override
+  List<Object> get props => [searchedItem];
+}

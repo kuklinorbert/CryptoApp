@@ -10,6 +10,7 @@ import 'package:cryptoapp/features/cryptoapp/domain/repositories/items_repositor
 import 'package:cryptoapp/features/cryptoapp/domain/usecases/check_auth.dart';
 import 'package:cryptoapp/features/cryptoapp/domain/usecases/get_events.dart';
 import 'package:cryptoapp/features/cryptoapp/domain/usecases/get_items.dart';
+import 'package:cryptoapp/features/cryptoapp/domain/usecases/get_search_result.dart';
 import 'package:cryptoapp/features/cryptoapp/domain/usecases/logout.dart';
 import 'package:cryptoapp/features/cryptoapp/domain/usecases/resend_code.dart';
 import 'package:cryptoapp/features/cryptoapp/domain/usecases/send_code.dart';
@@ -38,7 +39,8 @@ Future<void> init() async {
 
   sl.registerLazySingleton(() => EventsBloc(getEvents: sl()));
 
-  sl.registerLazySingleton(() => ItemsBloc(getItems: sl()));
+  sl.registerLazySingleton(
+      () => ItemsBloc(getItems: sl(), getSearchResult: sl()));
 
   //Use cases
   sl.registerLazySingleton(() => SendCode(sl()));
@@ -46,10 +48,9 @@ Future<void> init() async {
   sl.registerLazySingleton(() => VerifyCode(sl()));
   sl.registerLazySingleton(() => Logout(sl()));
   sl.registerLazySingleton(() => ResendCode(sl()));
-
   sl.registerLazySingleton(() => GetEvents(sl()));
-
   sl.registerLazySingleton(() => GetItems(sl()));
+  sl.registerLazySingleton(() => GetSearchResult(sl()));
 
   //Repository
   sl.registerLazySingleton<AuthRepository>(
@@ -67,8 +68,10 @@ Future<void> init() async {
 
   sl.registerLazySingleton<ItemsDataSource>(
       () => ItemsDataSourceImpl(client: sl()));
+
   //Core
   sl.registerLazySingleton<NetworkInfo>(() => NetworkInfoImpl(sl()));
+
   //External
   sl.registerLazySingleton(() => http.Client());
   sl.registerLazySingleton(() => FirebaseAuth.instance);

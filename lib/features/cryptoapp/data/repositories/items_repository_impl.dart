@@ -27,4 +27,23 @@ class ItemsRepositoryImpl implements ItemsRepository {
       return Left(ServerFailure());
     }
   }
+
+  @override
+  Future<Either<Failure, List<Items>>> getSearchResult(
+      String searchText) async {
+    if (await networkInfo.isConnected) {
+      try {
+        final result = await itemsDataSource.getSearchResult(searchText);
+        if (result.isNotEmpty) {
+          return Right(result);
+        } else {
+          return Left(ServerFailure());
+        }
+      } on ServerException {
+        return Left(ServerFailure());
+      }
+    } else {
+      return Left(ServerFailure());
+    }
+  }
 }

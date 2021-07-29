@@ -1,3 +1,4 @@
+import 'package:cryptoapp/features/cryptoapp/domain/usecases/get_search_result.dart';
 import 'package:cryptoapp/features/cryptoapp/presentation/pages/auth_page.dart';
 import 'package:cryptoapp/features/cryptoapp/presentation/pages/event_details_page.dart';
 import 'package:cryptoapp/features/cryptoapp/presentation/pages/main_page.dart';
@@ -21,8 +22,9 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-        create: (BuildContext context) =>
-            ItemsBloc(getItems: sl<GetItems>())..add(GetItemsEvent()),
+        create: (BuildContext context) => ItemsBloc(
+            getItems: sl<GetItems>(), getSearchResult: sl<GetSearchResult>())
+          ..add(GetItemsEvent()),
         child: MaterialApp(
             title: 'CryptoApp',
             theme: ThemeData(
