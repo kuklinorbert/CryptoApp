@@ -1,5 +1,6 @@
 import 'package:cryptoapp/features/cryptoapp/domain/usecases/get_search_result.dart';
 import 'package:cryptoapp/features/cryptoapp/presentation/pages/auth_page.dart';
+import 'package:cryptoapp/features/cryptoapp/presentation/pages/crypto_details_page.dart';
 import 'package:cryptoapp/features/cryptoapp/presentation/pages/event_details_page.dart';
 import 'package:cryptoapp/features/cryptoapp/presentation/pages/main_page.dart';
 import 'package:cryptoapp/injection_container.dart';
@@ -19,7 +20,6 @@ void main() async {
 }
 
 class MyApp extends StatelessWidget {
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
@@ -38,6 +38,7 @@ class MyApp extends StatelessWidget {
               '/auth': (context) => AuthPage(),
               '/main': (context) => MainPage(),
               '/eventdetails': (context) => EventDetailsPage(),
+              '/cryptodetails': (context) => CryptoDetailsPage(),
             }));
   }
 }

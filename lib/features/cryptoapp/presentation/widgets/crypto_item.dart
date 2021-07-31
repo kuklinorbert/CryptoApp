@@ -13,7 +13,9 @@ class CryptoItem extends StatelessWidget {
     format = item.logoUrl.substring(item.logoUrl.length - 3);
     return Card(
       child: InkWell(
-        onTap: () {},
+        onTap: () {
+          Navigator.of(context).pushNamed('/cryptodetails', arguments: item);
+        },
         child: SizedBox(
           height: MediaQuery.of(context).size.height * 0.15,
           width: MediaQuery.of(context).size.width,

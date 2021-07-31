@@ -25,7 +25,7 @@ Scaffold buildEventsPage(AuthBloc authBloc, NavigationbarBloc navbarBloc) {
       ),
     ),
     appBar: AppBar(
-      title: Text('CryptoApp'),
+      title: Text('Events'),
     ),
     body: BlocListener<AuthBloc, AuthState>(
         bloc: authBloc,
