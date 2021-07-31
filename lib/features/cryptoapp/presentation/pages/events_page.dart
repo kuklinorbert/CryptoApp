@@ -45,7 +45,6 @@ Scaffold buildEventsPage(AuthBloc authBloc, NavigationbarBloc navbarBloc) {
               }
             },
             builder: (context, state) {
-              print(state);
               if (state is EventsInitial) {
                 return Center(
                   child: Column(

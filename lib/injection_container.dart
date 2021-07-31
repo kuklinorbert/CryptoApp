@@ -12,11 +12,13 @@ import 'package:cryptoapp/features/cryptoapp/domain/repositories/favourites_repo
 import 'package:cryptoapp/features/cryptoapp/domain/repositories/items_repository.dart';
 import 'package:cryptoapp/features/cryptoapp/domain/usecases/add_favourite.dart';
 import 'package:cryptoapp/features/cryptoapp/domain/usecases/check_auth.dart';
+import 'package:cryptoapp/features/cryptoapp/domain/usecases/check_favourite.dart';
 import 'package:cryptoapp/features/cryptoapp/domain/usecases/get_events.dart';
 import 'package:cryptoapp/features/cryptoapp/domain/usecases/get_favourites.dart';
 import 'package:cryptoapp/features/cryptoapp/domain/usecases/get_items.dart';
 import 'package:cryptoapp/features/cryptoapp/domain/usecases/get_search_result.dart';
 import 'package:cryptoapp/features/cryptoapp/domain/usecases/logout.dart';
+import 'package:cryptoapp/features/cryptoapp/domain/usecases/remove_favourite.dart';
 import 'package:cryptoapp/features/cryptoapp/domain/usecases/resend_code.dart';
 import 'package:cryptoapp/features/cryptoapp/domain/usecases/send_code.dart';
 import 'package:cryptoapp/features/cryptoapp/domain/usecases/verify_code.dart';
@@ -50,8 +52,11 @@ Future<void> init() async {
   sl.registerLazySingleton(() =>
       ItemsBloc(getItems: sl(), getSearchResult: sl(), refreshItems: sl()));
 
-  sl.registerLazySingleton(
-      () => FavouritesBloc(addFavourite: sl(), getFavourites: sl()));
+  sl.registerLazySingleton(() => FavouritesBloc(
+      addFavourite: sl(),
+      getFavourites: sl(),
+      checkFavourite: sl(),
+      removeFavourite: sl()));
 
   //Use cases
   sl.registerLazySingleton(() => SendCode(sl()));
@@ -65,6 +70,8 @@ Future<void> init() async {
   sl.registerLazySingleton(() => RefreshItems(sl()));
   sl.registerLazySingleton(() => AddFavourite(sl()));
   sl.registerLazySingleton(() => GetFavourites(sl()));
+  sl.registerLazySingleton(() => CheckFavourite(sl()));
+  sl.registerLazySingleton(() => RemoveFavourite(sl()));
 
   //Repository
   sl.registerLazySingleton<AuthRepository>(

@@ -16,6 +16,16 @@ class GetFavouritesEvent extends FavouritesEvent {
   List<Object> get props => [uid];
 }
 
+class CheckFavouriteEvent extends FavouritesEvent {
+  final String uid;
+  final String itemId;
+
+  CheckFavouriteEvent({@required this.uid, @required this.itemId});
+
+  @override
+  List<Object> get props => [uid, itemId];
+}
+
 class AddFavouriteEvent extends FavouritesEvent {
   final String uid;
   final String itemId;
@@ -26,4 +36,12 @@ class AddFavouriteEvent extends FavouritesEvent {
   List<Object> get props => [uid, itemId];
 }
 
-class RemoveFavouriteEvent extends FavouritesEvent {}
+class RemoveFavouriteEvent extends FavouritesEvent {
+  final String uid;
+  final String itemId;
+
+  RemoveFavouriteEvent({@required this.uid, @required this.itemId});
+
+  @override
+  List<Object> get props => [uid, itemId];
+}

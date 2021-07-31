@@ -10,6 +10,7 @@ import 'package:http/http.dart';
 
 class FavouritesRepositoryImpl implements FavouritesRepository {
   final FavouritesDataSource favouritesDataSource;
+  Favourites savedFav = Favourites(favourites: []);
 
   FavouritesRepositoryImpl({@required this.favouritesDataSource});
 
@@ -17,9 +18,11 @@ class FavouritesRepositoryImpl implements FavouritesRepository {
   Future<Either<Failure, Response>> addFavourite(
       String uid, String itemId) async {
     try {
-      final result = await favouritesDataSource.addFavourite(uid, itemId);
+      savedFav.favourites.add(itemId);
+      final result = await favouritesDataSource.addFavourite(uid, savedFav);
       return Right(result);
     } on ServerException {
+      savedFav.favourites.remove(itemId);
       return Left(ServerFailure());
     }
   }
@@ -35,8 +38,33 @@ class FavouritesRepositoryImpl implements FavouritesRepository {
   }
 
   @override
-  Future<Either<Failure, Response>> removeFavourite(String uid, String itemId) {
-    // TODO: implement removeFavourite
-    throw UnimplementedError();
+  Future<Either<Failure, Response>> removeFavourite(
+      String uid, String itemId) async {
+    try {
+      savedFav.favourites.remove(itemId);
+      final result = await favouritesDataSource.addFavourite(uid, savedFav);
+      return Right(result);
+    } on ServerException {
+      savedFav.favourites.add(itemId);
+      return Left(ServerFailure());
+    }
+  }
+
+  @override
+  Future<Either<Failure, bool>> checkFavourite(
+      String uid, String itemId) async {
+    try {
+      if (savedFav.favourites.isEmpty) {
+        final result = await favouritesDataSource.checkFavourites(uid);
+        savedFav = result;
+      }
+      if (savedFav.favourites.contains(itemId)) {
+        return Right(true);
+      } else {
+        return Right(false);
+      }
+    } on ServerException {
+      return Left(ServerFailure());
+    }
   }
 }

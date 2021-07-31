@@ -11,7 +11,7 @@ class FavouritesInitial extends FavouritesState {}
 
 class LoadingFavouritesState extends FavouritesState {}
 
-class FavouritesFetchedState extends FavouriteState {
+class FavouritesFetchedState extends FavouritesState {
   final List<Items> favourites;
 
   FavouritesFetchedState({@required this.favourites});
@@ -19,11 +19,11 @@ class FavouritesFetchedState extends FavouriteState {
   List<Object> get props => [favourites];
 }
 
-class FavouriteState extends FavouritesState {}
+class YesFavouriteState extends FavouritesState {}
 
-class NotFavouriteState extends FavouriteState {}
+class NotFavouriteState extends FavouritesState {}
 
-class ErrorFavouritesState extends FavouriteState {
+class ErrorFavouritesState extends FavouritesState {
   final String message;
 
   ErrorFavouritesState({@required this.message});

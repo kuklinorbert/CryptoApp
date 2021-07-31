@@ -34,7 +34,6 @@ class _AuthPageState extends State<AuthPage> {
         body: BlocListener<AuthBloc, AuthState>(
       bloc: sl<AuthBloc>(),
       listener: (context, state) {
-        print(state);
         if (state is Authenticated) {
           Navigator.of(context).pushReplacementNamed('/main');
         } else if (state is ErrorLoggedState) {
@@ -175,7 +174,6 @@ class _AuthPageState extends State<AuthPage> {
                         onPressed: (resendTimes >= 3)
                             ? null
                             : () {
-                                print(resendTimes);
                                 resendTimes++;
                                 authBloc.add(ResendCodeEvent());
                               },

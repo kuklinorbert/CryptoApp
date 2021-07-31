@@ -80,7 +80,6 @@ class AuthRepositoryImpl implements AuthRepository {
         PhoneAuthCredential credential = PhoneAuthProvider.credential(
             verificationId: verificationId, smsCode: smsCode);
         final result = await _firebaseAuth.signInWithCredential(credential);
-        print(result);
         return Right(result);
       } catch (e) {
         return Left(VerifyFailure());

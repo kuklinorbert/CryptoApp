@@ -1,5 +1,6 @@
 import 'package:cryptoapp/features/cryptoapp/domain/entities/items.dart';
 import 'package:cryptoapp/features/cryptoapp/presentation/bloc/auth/auth_bloc.dart';
+import 'package:cryptoapp/features/cryptoapp/presentation/bloc/favourites/favourites_bloc.dart';
 import 'package:cryptoapp/features/cryptoapp/presentation/bloc/items/items_bloc.dart';
 import 'package:cryptoapp/features/cryptoapp/presentation/bloc/navigationbar/navigationbar_bloc.dart';
 import 'package:cryptoapp/features/cryptoapp/presentation/pages/events_page.dart';
@@ -22,6 +23,7 @@ class _MainPageState extends State<MainPage> {
   AuthBloc authBloc;
   NavigationbarBloc navbarBloc;
   ItemsBloc itemsBloc;
+  FavouritesBloc favouritesBloc;
   final TextEditingController _textController = TextEditingController();
 
   @override
@@ -29,6 +31,7 @@ class _MainPageState extends State<MainPage> {
     itemsBloc = sl<ItemsBloc>();
     authBloc = sl<AuthBloc>();
     navbarBloc = sl<NavigationbarBloc>();
+    favouritesBloc = sl<FavouritesBloc>();
     super.initState();
   }
 
@@ -48,7 +51,7 @@ class _MainPageState extends State<MainPage> {
                   authBloc, navbarBloc, itemsBloc, context, _textController),
             );
           } else if (state is NavigationbarFavourites) {
-            return buildFavouritesPage(authBloc, navbarBloc);
+            return buildFavouritesPage(authBloc, navbarBloc, favouritesBloc);
           } else if (state is NavigationbarEvents) {
             return buildEventsPage(authBloc, navbarBloc);
           } else {
@@ -139,7 +142,6 @@ Scaffold buildHomePage(
           child: BlocConsumer<ItemsBloc, ItemsState>(
               listener: (context, state) {},
               builder: (context, state) {
-                print(state);
                 if (state is LoadingItems && _items.isEmpty ||
                     state is LoadingSearchResult) {
                   return Center(child: CircularProgressIndicator());

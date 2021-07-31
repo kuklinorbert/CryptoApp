@@ -18,27 +18,42 @@ class CryptoDetailsPage extends StatelessWidget {
         appBar: AppBar(
           title: Text(item.name),
           actions: [
-            IconButton(
-                onPressed: () {
-                  favouritesBloc.add(AddFavouriteEvent(
-                      itemId: item.id,
-                      uid: FirebaseAuth.instance.currentUser.uid));
+            BlocBuilder<FavouritesBloc, FavouritesState>(
+                bloc: favouritesBloc
+                  ..add(CheckFavouriteEvent(
+                      uid: FirebaseAuth.instance.currentUser.uid,
+                      itemId: item.id)),
+                buildWhen: (previous, current) {
+                  if (current is LoadingFavouritesState ||
+                      current is FavouritesFetchedState) {
+                    return false;
+                  } else {
+                    return true;
+                  }
                 },
-                icon: Icon(Icons.favorite_border))
+                builder: (context, state) {
+                  if (state is NotFavouriteState) {
+                    return IconButton(
+                        onPressed: () {
+                          favouritesBloc.add(AddFavouriteEvent(
+                              itemId: item.id,
+                              uid: FirebaseAuth.instance.currentUser.uid));
+                        },
+                        icon: Icon(Icons.favorite_outline));
+                  }
+                  if (state is YesFavouriteState) {
+                    return IconButton(
+                        onPressed: () {
+                          favouritesBloc.add(RemoveFavouriteEvent(
+                              itemId: item.id,
+                              uid: FirebaseAuth.instance.currentUser.uid));
+                        },
+                        icon: Icon(Icons.favorite));
+                  }
+                  return Container();
+                })
           ],
         ),
-        body: BlocBuilder<FavouritesBloc, FavouritesState>(
-          bloc: favouritesBloc
-            ..add(
-                GetFavouritesEvent(uid: FirebaseAuth.instance.currentUser.uid)),
-          builder: (context, state) {
-            if (state is FavouritesFetchedState) {
-              return Center(
-                child: Text('Hehe'),
-              );
-            }
-            return Container();
-          },
-        ));
+        body: Container());
   }
 }

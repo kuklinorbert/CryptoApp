@@ -6,9 +6,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../../injection_container.dart';
-
-Scaffold buildFavouritesPage(AuthBloc authBloc, NavigationbarBloc navbarBloc) {
+Scaffold buildFavouritesPage(AuthBloc authBloc, NavigationbarBloc navbarBloc,
+    FavouritesBloc favouritesBloc) {
   return Scaffold(
     drawer: Drawer(
       child: ListView(
@@ -36,34 +35,47 @@ Scaffold buildFavouritesPage(AuthBloc authBloc, NavigationbarBloc navbarBloc) {
                 .pushNamedAndRemoveUntil('/auth', (route) => false);
           }
         },
-        child: BlocBuilder<FavouritesBloc, FavouritesState>(
-          bloc: sl<FavouritesBloc>()
-            ..add(
-                GetFavouritesEvent(uid: FirebaseAuth.instance.currentUser.uid)),
-          builder: (context, state) {
-            if (state is LoadingFavouritesState) {
-              return Center(
-                child: CircularProgressIndicator(),
-              );
-            }
-            if (state is FavouritesFetchedState) {
-              return Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: ListView.separated(
-                    physics: AlwaysScrollableScrollPhysics(),
-                    itemBuilder: (context, index) {
-                      return CryptoItem(state.favourites[index]);
-                    },
-                    separatorBuilder: (context, index) =>
-                        const SizedBox(height: 10),
-                    itemCount: state.favourites.length),
-              );
-            }
-            return Center(
-              child: Text('No favourites added yet!'),
-            );
-          },
-        )),
+        child: BlocListener<FavouritesBloc, FavouritesState>(
+            bloc: favouritesBloc,
+            listener: (context, state) {
+              print(state);
+              if (state is YesFavouriteState) {
+                favouritesBloc.add(GetFavouritesEvent(
+                    uid: FirebaseAuth.instance.currentUser.uid));
+              }
+              if (state is NotFavouriteState) {
+                favouritesBloc.add(GetFavouritesEvent(
+                    uid: FirebaseAuth.instance.currentUser.uid));
+              }
+            },
+            child: BlocBuilder<FavouritesBloc, FavouritesState>(
+              bloc: favouritesBloc
+                ..add(GetFavouritesEvent(
+                    uid: FirebaseAuth.instance.currentUser.uid)),
+              builder: (context, state) {
+                if (state is LoadingFavouritesState) {
+                  return Center(
+                    child: CircularProgressIndicator(),
+                  );
+                }
+                if (state is FavouritesFetchedState) {
+                  return Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: ListView.separated(
+                        physics: AlwaysScrollableScrollPhysics(),
+                        itemBuilder: (context, index) {
+                          return CryptoItem(state.favourites[index]);
+                        },
+                        separatorBuilder: (context, index) =>
+                            const SizedBox(height: 10),
+                        itemCount: state.favourites.length),
+                  );
+                }
+                return Center(
+                  child: Text('No favourites added yet!'),
+                );
+              },
+            ))),
     bottomNavigationBar: BottomNavigationBar(
       currentIndex: 1,
       onTap: (index) {
