@@ -1,5 +1,6 @@
 import 'package:cryptoapp/features/cryptoapp/domain/entities/items.dart';
 import 'package:cryptoapp/features/cryptoapp/presentation/bloc/auth/auth_bloc.dart';
+import 'package:cryptoapp/features/cryptoapp/presentation/bloc/chart/chart_bloc.dart';
 import 'package:cryptoapp/features/cryptoapp/presentation/bloc/favourites/favourites_bloc.dart';
 import 'package:cryptoapp/features/cryptoapp/presentation/bloc/items/items_bloc.dart';
 import 'package:cryptoapp/features/cryptoapp/presentation/bloc/navigationbar/navigationbar_bloc.dart';

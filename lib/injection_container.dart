@@ -1,18 +1,22 @@
 import 'package:cryptoapp/core/network/network_info.dart';
+import 'package:cryptoapp/features/cryptoapp/data/datasources/chart_data_source.dart';
 import 'package:cryptoapp/features/cryptoapp/data/datasources/events_data_source.dart';
 import 'package:cryptoapp/features/cryptoapp/data/datasources/favourites_data_source.dart';
 import 'package:cryptoapp/features/cryptoapp/data/datasources/items_data_source.dart';
 import 'package:cryptoapp/features/cryptoapp/data/repositories/auth_repository_impl.dart';
+import 'package:cryptoapp/features/cryptoapp/data/repositories/chart_repository_impl.dart';
 import 'package:cryptoapp/features/cryptoapp/data/repositories/events_repository_impl.dart';
 import 'package:cryptoapp/features/cryptoapp/data/repositories/favourites_repository_impl.dart';
 import 'package:cryptoapp/features/cryptoapp/data/repositories/items_repository_impl.dart';
 import 'package:cryptoapp/features/cryptoapp/domain/repositories/auth_repository.dart';
+import 'package:cryptoapp/features/cryptoapp/domain/repositories/chart_repository.dart';
 import 'package:cryptoapp/features/cryptoapp/domain/repositories/events_repository.dart';
 import 'package:cryptoapp/features/cryptoapp/domain/repositories/favourites_repository.dart';
 import 'package:cryptoapp/features/cryptoapp/domain/repositories/items_repository.dart';
 import 'package:cryptoapp/features/cryptoapp/domain/usecases/add_favourite.dart';
 import 'package:cryptoapp/features/cryptoapp/domain/usecases/check_auth.dart';
 import 'package:cryptoapp/features/cryptoapp/domain/usecases/check_favourite.dart';
+import 'package:cryptoapp/features/cryptoapp/domain/usecases/get_chart.dart';
 import 'package:cryptoapp/features/cryptoapp/domain/usecases/get_events.dart';
 import 'package:cryptoapp/features/cryptoapp/domain/usecases/get_favourites.dart';
 import 'package:cryptoapp/features/cryptoapp/domain/usecases/get_items.dart';
@@ -23,8 +27,10 @@ import 'package:cryptoapp/features/cryptoapp/domain/usecases/resend_code.dart';
 import 'package:cryptoapp/features/cryptoapp/domain/usecases/send_code.dart';
 import 'package:cryptoapp/features/cryptoapp/domain/usecases/verify_code.dart';
 import 'package:cryptoapp/features/cryptoapp/presentation/bloc/auth/auth_bloc.dart';
+import 'package:cryptoapp/features/cryptoapp/presentation/bloc/chart/chart_bloc.dart';
 import 'package:cryptoapp/features/cryptoapp/presentation/bloc/events/events_bloc.dart';
 import 'package:cryptoapp/features/cryptoapp/presentation/bloc/favourites/favourites_bloc.dart';
+import 'package:cryptoapp/features/cryptoapp/presentation/bloc/interval/interval_bloc.dart';
 import 'package:cryptoapp/features/cryptoapp/presentation/bloc/items/items_bloc.dart';
 import 'package:cryptoapp/features/cryptoapp/presentation/bloc/navigationbar/navigationbar_bloc.dart';
 import 'package:data_connection_checker/data_connection_checker.dart';
@@ -58,6 +64,10 @@ Future<void> init() async {
       checkFavourite: sl(),
       removeFavourite: sl()));
 
+  sl.registerLazySingleton(() => ChartBloc(getChart: sl()));
+
+  sl.registerLazySingleton(() => IntervalBloc());
+
   //Use cases
   sl.registerLazySingleton(() => SendCode(sl()));
   sl.registerLazySingleton(() => CheckAuth(sl()));
@@ -72,6 +82,7 @@ Future<void> init() async {
   sl.registerLazySingleton(() => GetFavourites(sl()));
   sl.registerLazySingleton(() => CheckFavourite(sl()));
   sl.registerLazySingleton(() => RemoveFavourite(sl()));
+  sl.registerLazySingleton(() => GetChart(sl()));
 
   //Repository
   sl.registerLazySingleton<AuthRepository>(
@@ -86,6 +97,9 @@ Future<void> init() async {
   sl.registerLazySingleton<FavouritesRepository>(
       () => FavouritesRepositoryImpl(favouritesDataSource: sl()));
 
+  sl.registerLazySingleton<ChartRepository>(
+      () => ChartRepositoryImpl(chartDataSource: sl()));
+
   //Data sources
   sl.registerLazySingleton<EventsDataSource>(
       () => EventsDataSourceImpl(client: sl()));
@@ -95,6 +109,9 @@ Future<void> init() async {
 
   sl.registerLazySingleton<FavouritesDataSource>(
       () => FavouritesDataSourceImpl(client: sl()));
+
+  sl.registerLazySingleton<ChartDataSource>(
+      () => ChartDataSourceImpl(client: sl()));
 
   //Core
   sl.registerLazySingleton<NetworkInfo>(() => NetworkInfoImpl(sl()));
