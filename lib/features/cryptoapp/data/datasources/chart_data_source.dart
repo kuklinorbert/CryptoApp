@@ -31,7 +31,6 @@ class ChartDataSourceImpl implements ChartDataSource {
     final response =
         await client.get(uri, headers: {'Content-Type': 'application/json'});
     //429
-    print(response.statusCode);
     if (response.statusCode == 200) {
       return chartModelFromJson(response.body);
     } else {

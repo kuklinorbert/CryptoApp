@@ -1,34 +1,32 @@
 import 'package:cryptoapp/features/cryptoapp/presentation/bloc/auth/auth_bloc.dart';
 import 'package:cryptoapp/features/cryptoapp/presentation/bloc/favourites/favourites_bloc.dart';
-import 'package:cryptoapp/features/cryptoapp/presentation/bloc/navigationbar/navigationbar_bloc.dart';
 import 'package:cryptoapp/features/cryptoapp/presentation/widgets/crypto_item.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-Scaffold buildFavouritesPage(AuthBloc authBloc, NavigationbarBloc navbarBloc,
-    FavouritesBloc favouritesBloc) {
-  return Scaffold(
-    drawer: Drawer(
-      child: ListView(
-        padding: EdgeInsets.only(top: 50, left: 15),
-        children: [
-          Text(FirebaseAuth.instance.currentUser.phoneNumber),
-          Divider(),
-          ListTile(
-            title: Text('Logout'),
-            onTap: () {
-              authBloc.add(LogoutEvent());
-            },
-          )
-        ],
-      ),
-    ),
-    appBar: AppBar(
-      title: Text('Favourites'),
-    ),
-    body: BlocListener<AuthBloc, AuthState>(
-        bloc: authBloc,
+class FavouritesPage extends StatefulWidget {
+  const FavouritesPage(
+      {Key key, @required this.authBloc, @required this.favouritesBloc})
+      : super(key: key);
+
+  final AuthBloc authBloc;
+  final FavouritesBloc favouritesBloc;
+
+  @override
+  _FavouritesPage1State createState() => _FavouritesPage1State();
+}
+
+class _FavouritesPage1State extends State<FavouritesPage>
+    with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
+
+  @override
+  Widget build(BuildContext context) {
+    super.build(context);
+    return BlocListener<AuthBloc, AuthState>(
+        bloc: widget.authBloc,
         listener: (context, state) {
           if (state is Unauthenticated) {
             Navigator.of(context)
@@ -36,20 +34,20 @@ Scaffold buildFavouritesPage(AuthBloc authBloc, NavigationbarBloc navbarBloc,
           }
         },
         child: BlocListener<FavouritesBloc, FavouritesState>(
-            bloc: favouritesBloc,
+            bloc: widget.favouritesBloc,
             listener: (context, state) {
               print(state);
               if (state is YesFavouriteState) {
-                favouritesBloc.add(GetFavouritesEvent(
+                widget.favouritesBloc.add(GetFavouritesEvent(
                     uid: FirebaseAuth.instance.currentUser.uid));
               }
               if (state is NotFavouriteState) {
-                favouritesBloc.add(GetFavouritesEvent(
+                widget.favouritesBloc.add(GetFavouritesEvent(
                     uid: FirebaseAuth.instance.currentUser.uid));
               }
             },
             child: BlocBuilder<FavouritesBloc, FavouritesState>(
-              bloc: favouritesBloc
+              bloc: widget.favouritesBloc
                 ..add(GetFavouritesEvent(
                     uid: FirebaseAuth.instance.currentUser.uid)),
               builder: (context, state) {
@@ -75,20 +73,6 @@ Scaffold buildFavouritesPage(AuthBloc authBloc, NavigationbarBloc navbarBloc,
                   child: Text('No favourites added yet!'),
                 );
               },
-            ))),
-    bottomNavigationBar: BottomNavigationBar(
-      currentIndex: 1,
-      onTap: (index) {
-        if (index == 0) navbarBloc.add(HomeSelected());
-        if (index == 1) navbarBloc.add(FavouritesSelected());
-        if (index == 2) navbarBloc.add(EventsSelected());
-      },
-      items: [
-        BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-        BottomNavigationBarItem(
-            icon: Icon(Icons.favorite), label: 'Favourites'),
-        BottomNavigationBarItem(icon: Icon(Icons.feed), label: 'Events'),
-      ],
-    ),
-  );
+            )));
+  }
 }

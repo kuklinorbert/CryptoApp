@@ -1,34 +1,28 @@
 import 'package:cryptoapp/features/cryptoapp/presentation/bloc/auth/auth_bloc.dart';
 import 'package:cryptoapp/features/cryptoapp/presentation/bloc/events/events_bloc.dart';
-import 'package:cryptoapp/features/cryptoapp/presentation/bloc/navigationbar/navigationbar_bloc.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../injection_container.dart';
 
-Scaffold buildEventsPage(AuthBloc authBloc, NavigationbarBloc navbarBloc) {
-  return Scaffold(
-    drawer: Drawer(
-      child: ListView(
-        padding: EdgeInsets.only(top: 50, left: 15),
-        children: [
-          Text(FirebaseAuth.instance.currentUser.phoneNumber),
-          Divider(),
-          ListTile(
-            title: Text('Logout'),
-            onTap: () {
-              authBloc.add(LogoutEvent());
-            },
-          )
-        ],
-      ),
-    ),
-    appBar: AppBar(
-      title: Text('Events'),
-    ),
-    body: BlocListener<AuthBloc, AuthState>(
-        bloc: authBloc,
+class EventsPage extends StatefulWidget {
+  const EventsPage({Key key, @required this.authBloc}) : super(key: key);
+
+  final AuthBloc authBloc;
+
+  @override
+  _EventsPageState createState() => _EventsPageState();
+}
+
+class _EventsPageState extends State<EventsPage>
+    with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
+  @override
+  Widget build(BuildContext context) {
+    super.build(context);
+    return BlocListener<AuthBloc, AuthState>(
+        bloc: widget.authBloc,
         listener: (context, state) {
           if (state is Unauthenticated) {
             Navigator.of(context)
@@ -120,20 +114,6 @@ Scaffold buildEventsPage(AuthBloc authBloc, NavigationbarBloc navbarBloc) {
               } else {
                 return Container();
               }
-            })),
-    bottomNavigationBar: BottomNavigationBar(
-      currentIndex: 2,
-      onTap: (index) {
-        if (index == 0) navbarBloc.add(HomeSelected());
-        if (index == 1) navbarBloc.add(FavouritesSelected());
-        if (index == 2) navbarBloc.add(EventsSelected());
-      },
-      items: [
-        BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-        BottomNavigationBarItem(
-            icon: Icon(Icons.favorite), label: 'Favourites'),
-        BottomNavigationBarItem(icon: Icon(Icons.feed), label: 'Events'),
-      ],
-    ),
-  );
+            }));
+  }
 }
