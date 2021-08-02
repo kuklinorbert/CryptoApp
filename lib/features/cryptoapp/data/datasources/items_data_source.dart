@@ -7,6 +7,7 @@ abstract class ItemsDataSource {
   Future<List<ItemsModel>> getItems(int page);
   Future<List<ItemsModel>> getSearchResult(String searchText);
   Future<List<ItemsModel>> refreshItems(int page);
+  Future<List<ItemsModel>> getConvertedItem(String itemId);
 }
 
 class ItemsDataSourceImpl implements ItemsDataSource {
@@ -45,4 +46,8 @@ class ItemsDataSourceImpl implements ItemsDataSource {
     return _getItemsFromUrl(
         'https://api.nomics.com/v1/currencies/ticker?key=9b477e525212e4d0ae32ca7dd6f17f9d3e1e4c95&sort=rank&per-page=$refreshCount');
   }
+
+  @override
+  Future<List<ItemsModel>> getConvertedItem(String itemId) => _getItemsFromUrl(
+      'https://api.nomics.com/v1/currencies/ticker?key=9b477e525212e4d0ae32ca7dd6f17f9d3e1e4c95&ids=$itemId&convert=EUR');
 }

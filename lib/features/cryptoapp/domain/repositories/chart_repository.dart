@@ -3,5 +3,6 @@ import 'package:cryptoapp/features/cryptoapp/domain/entities/chart.dart';
 import 'package:dartz/dartz.dart';
 
 abstract class ChartRepository {
-  Future<Either<Failure, List<Chart>>> getChart(String itemId, String interval);
+  Future<Either<Failure, List<Chart>>> getChart(
+      String itemId, String interval, bool convert);
 }

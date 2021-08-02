@@ -12,16 +12,19 @@ class GetChart extends UseCase<List<Chart>, Params> {
 
   @override
   Future<Either<Failure, List<Chart>>> call(Params params) async {
-    return await chartRepository.getChart(params.itemId, params.interval);
+    return await chartRepository.getChart(
+        params.itemId, params.interval, params.convert);
   }
 }
 
 class Params {
   final String itemId;
   final String interval;
+  final bool convert;
 
-  Params({@required this.itemId, @required this.interval});
+  Params(
+      {@required this.itemId, @required this.interval, @required this.convert});
 
   @override
-  List<Object> get props => [interval, itemId];
+  List<Object> get props => [itemId, interval, convert];
 }

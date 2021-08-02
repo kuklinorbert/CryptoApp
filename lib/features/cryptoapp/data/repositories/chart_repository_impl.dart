@@ -13,9 +13,9 @@ class ChartRepositoryImpl implements ChartRepository {
 
   @override
   Future<Either<Failure, List<Chart>>> getChart(
-      String itemId, String interval) async {
+      String itemId, String interval, bool convert) async {
     try {
-      final result = await chartDataSource.getChart(itemId, interval);
+      final result = await chartDataSource.getChart(itemId, interval, convert);
       return Right(result);
     } on ServerException {
       throw Left(ServerFailure());

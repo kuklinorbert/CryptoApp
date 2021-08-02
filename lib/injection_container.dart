@@ -5,11 +5,13 @@ import 'package:cryptoapp/features/cryptoapp/data/datasources/favourites_data_so
 import 'package:cryptoapp/features/cryptoapp/data/datasources/items_data_source.dart';
 import 'package:cryptoapp/features/cryptoapp/data/repositories/auth_repository_impl.dart';
 import 'package:cryptoapp/features/cryptoapp/data/repositories/chart_repository_impl.dart';
+import 'package:cryptoapp/features/cryptoapp/data/repositories/converter_repository_impl.dart';
 import 'package:cryptoapp/features/cryptoapp/data/repositories/events_repository_impl.dart';
 import 'package:cryptoapp/features/cryptoapp/data/repositories/favourites_repository_impl.dart';
 import 'package:cryptoapp/features/cryptoapp/data/repositories/items_repository_impl.dart';
 import 'package:cryptoapp/features/cryptoapp/domain/repositories/auth_repository.dart';
 import 'package:cryptoapp/features/cryptoapp/domain/repositories/chart_repository.dart';
+import 'package:cryptoapp/features/cryptoapp/domain/repositories/converter_repository.dart';
 import 'package:cryptoapp/features/cryptoapp/domain/repositories/events_repository.dart';
 import 'package:cryptoapp/features/cryptoapp/domain/repositories/favourites_repository.dart';
 import 'package:cryptoapp/features/cryptoapp/domain/repositories/items_repository.dart';
@@ -17,6 +19,7 @@ import 'package:cryptoapp/features/cryptoapp/domain/usecases/add_favourite.dart'
 import 'package:cryptoapp/features/cryptoapp/domain/usecases/check_auth.dart';
 import 'package:cryptoapp/features/cryptoapp/domain/usecases/check_favourite.dart';
 import 'package:cryptoapp/features/cryptoapp/domain/usecases/get_chart.dart';
+import 'package:cryptoapp/features/cryptoapp/domain/usecases/get_converted_item.dart';
 import 'package:cryptoapp/features/cryptoapp/domain/usecases/get_events.dart';
 import 'package:cryptoapp/features/cryptoapp/domain/usecases/get_favourites.dart';
 import 'package:cryptoapp/features/cryptoapp/domain/usecases/get_items.dart';
@@ -28,6 +31,7 @@ import 'package:cryptoapp/features/cryptoapp/domain/usecases/send_code.dart';
 import 'package:cryptoapp/features/cryptoapp/domain/usecases/verify_code.dart';
 import 'package:cryptoapp/features/cryptoapp/presentation/bloc/auth/auth_bloc.dart';
 import 'package:cryptoapp/features/cryptoapp/presentation/bloc/chart/chart_bloc.dart';
+import 'package:cryptoapp/features/cryptoapp/presentation/bloc/converter/converter_bloc.dart';
 import 'package:cryptoapp/features/cryptoapp/presentation/bloc/events/events_bloc.dart';
 import 'package:cryptoapp/features/cryptoapp/presentation/bloc/favourites/favourites_bloc.dart';
 import 'package:cryptoapp/features/cryptoapp/presentation/bloc/interval/interval_bloc.dart';
@@ -68,6 +72,8 @@ Future<void> init() async {
 
   sl.registerLazySingleton(() => IntervalBloc());
 
+  sl.registerLazySingleton(() => ConverterBloc(getConvertedItem: sl()));
+
   //Use cases
   sl.registerLazySingleton(() => SendCode(sl()));
   sl.registerLazySingleton(() => CheckAuth(sl()));
@@ -83,6 +89,7 @@ Future<void> init() async {
   sl.registerLazySingleton(() => CheckFavourite(sl()));
   sl.registerLazySingleton(() => RemoveFavourite(sl()));
   sl.registerLazySingleton(() => GetChart(sl()));
+  sl.registerLazySingleton(() => GetConvertedItem(sl()));
 
   //Repository
   sl.registerLazySingleton<AuthRepository>(
@@ -99,6 +106,9 @@ Future<void> init() async {
 
   sl.registerLazySingleton<ChartRepository>(
       () => ChartRepositoryImpl(chartDataSource: sl()));
+
+  sl.registerLazySingleton<ConverterRepository>(
+      () => ConverterRepositoryImpl(networkInfo: sl(), itemsDataSource: sl()));
 
   //Data sources
   sl.registerLazySingleton<EventsDataSource>(

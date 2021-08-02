@@ -25,8 +25,10 @@ class ChartBloc extends Bloc<ChartEvent, ChartState> {
   ) async* {
     if (event is GetChartEvent) {
       yield ChartLoadingState();
-      final failureOrChart = await _getChart
-          .call(Params(itemId: event.itemId, interval: event.interval));
+      final failureOrChart = await _getChart.call(Params(
+          itemId: event.itemId,
+          interval: event.interval,
+          convert: event.convert));
       yield* _eitherChartOrErrorState(failureOrChart);
     }
   }

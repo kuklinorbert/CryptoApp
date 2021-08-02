@@ -10,8 +10,10 @@ abstract class ChartEvent extends Equatable {
 class GetChartEvent extends ChartEvent {
   final String itemId;
   final String interval;
+  final bool convert;
 
-  GetChartEvent({@required this.itemId, @required this.interval});
+  GetChartEvent(
+      {@required this.itemId, @required this.interval, @required this.convert});
 
-  List<Object> get props => [itemId, interval];
+  List<Object> get props => [itemId, interval, convert];
 }

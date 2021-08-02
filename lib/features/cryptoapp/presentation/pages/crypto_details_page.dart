@@ -1,6 +1,7 @@
 import 'package:cryptoapp/features/cryptoapp/domain/entities/items.dart';
 import 'package:cryptoapp/features/cryptoapp/domain/entities/items_interval.dart';
 import 'package:cryptoapp/features/cryptoapp/presentation/bloc/chart/chart_bloc.dart';
+import 'package:cryptoapp/features/cryptoapp/presentation/bloc/converter/converter_bloc.dart';
 import 'package:cryptoapp/features/cryptoapp/presentation/bloc/favourites/favourites_bloc.dart';
 import 'package:cryptoapp/features/cryptoapp/presentation/bloc/interval/interval_bloc.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -20,14 +21,9 @@ class CryptoDetailsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     FavouritesBloc favouritesBloc = sl<FavouritesBloc>();
-    ChartBloc chartBloc = sl<ChartBloc>();
-    IntervalBloc intervalBloc = sl<IntervalBloc>();
     Items item = ModalRoute.of(context).settings.arguments;
-    Items itemEur;
-    ItemsInterval interval;
-    DateTime today = new DateTime.now();
-    String format = item.logoUrl.substring(item.logoUrl.length - 3);
-    TextStyle defaultStyle = TextStyle(fontSize: 16);
+
+    ConverterBloc converterBloc = sl<ConverterBloc>();
 
     return Scaffold(
         appBar: AppBar(
@@ -75,166 +71,193 @@ class CryptoDetailsPage extends StatelessWidget {
         body: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.all(12.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Flexible(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            item.name,
-                            style: TextStyle(
-                                fontSize: 35, fontWeight: FontWeight.w600),
-                          ),
-                          Text(item.currency + " • " + item.status,
-                              style: TextStyle(fontSize: 18)),
-                        ],
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(right: 8.0, top: 2.0),
-                      child: SizedBox(
-                        width: MediaQuery.of(context).size.height * 0.10,
-                        height: MediaQuery.of(context).size.height * 0.10,
-                        child: (format == 'svg')
-                            ? SvgPicture.network(
-                                item.logoUrl,
-                                fit: BoxFit.fill,
-                              )
-                            : Image.network(
-                                item.logoUrl,
-                                fit: BoxFit.fill,
-                              ),
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(
-                  height: 15,
-                ),
-                Text(
-                  double.parse(item.price).toStringAsFixed(3) + " \$",
-                  style: TextStyle(fontSize: 26),
-                ),
-                BlocBuilder<IntervalBloc, IntervalState>(
-                  bloc: intervalBloc,
-                  builder: (context, state) {
-                    if (state is OneDayState) {
-                      interval = item.the1D;
-                      return buildInterval(context, interval, item, chartBloc,
-                          today, 1, intervalBloc);
-                    }
-                    if (state is OneWeekState) {
-                      interval = item.the7D;
-                      return buildInterval(context, interval, item, chartBloc,
-                          today, 7, intervalBloc);
-                    }
-                    if (state is OneMonthState) {
-                      interval = item.the30D;
-                      return buildInterval(context, interval, item, chartBloc,
-                          today, 30, intervalBloc);
-                    }
-                    if (state is OneYearState) {
-                      interval = item.the365D;
-                      return buildInterval(context, interval, item, chartBloc,
-                          today, 365, intervalBloc);
-                    }
-                    if (state is YearToDayState) {
-                      interval = item.ytd;
-                      return buildInterval(context, interval, item, chartBloc,
-                          today, 0, intervalBloc);
-                    }
-                    return Container();
-                  },
-                ),
-                SizedBox(
-                  height: 15,
-                ),
-                Text(
-                  "Circulating supply: " +
-                      formatLongNumber(item.circulatingSupply),
-                  style: defaultStyle,
-                ),
-                SizedBox(
-                  height: 5,
-                ),
-                item.maxSupply != null
-                    ? Text("Max supply: " + formatLongNumber(item.maxSupply),
-                        style: defaultStyle)
-                    : Text("Max supply: " + " - ", style: defaultStyle),
-                SizedBox(height: 5),
-                Divider(),
-                SizedBox(
-                  height: 5,
-                ),
-                Text(
-                  "All time high: " +
-                      NumberFormat("###,##0.00")
-                          .format(double.parse(item.high)),
-                  style: defaultStyle,
-                ),
-                Text(
-                  "Date: " +
-                      item.highTimestamp
-                          .toIso8601String()
-                          .substring(0, 10)
-                          .replaceAll("-", "/"),
-                  style: defaultStyle,
-                ),
-                SizedBox(height: 5),
-                Divider(),
-                SizedBox(
-                  height: 5,
-                ),
-                Text("Num exchanges: " + item.numExchanges,
-                    style: defaultStyle),
-                Text("Num pairs: " + item.numPairs, style: defaultStyle),
-                Text("Num pairs unmapped: " + item.numPairsUnmapped,
-                    style: defaultStyle),
-                SizedBox(height: 5),
-                Divider(),
-                SizedBox(
-                  height: 5,
-                ),
-                Text(
-                    "First trade: " +
-                        item.firstTrade
-                            .toIso8601String()
-                            .substring(0, 10)
-                            .replaceAll("-", "/"),
-                    style: defaultStyle),
-                Text(
-                    "First candle: " +
-                        item.firstCandle
-                            .toIso8601String()
-                            .substring(0, 10)
-                            .replaceAll("-", "/"),
-                    style: defaultStyle),
-                Text(
-                    "First order book: " +
-                        item.firstOrderBook
-                            .toIso8601String()
-                            .substring(0, 10)
-                            .replaceAll("-", "/"),
-                    style: defaultStyle),
-                SizedBox(height: 10),
-              ],
+            child: BlocBuilder<ConverterBloc, ConverterState>(
+              bloc: converterBloc..add(SwitchToUsdEvent()),
+              builder: (context, state) {
+                if (state is ConverterUSDState) {
+                  return buildBody(item, context, converterBloc, false, "\$");
+                }
+                if (state is ConverterEURState) {
+                  return buildBody(
+                      state.item, context, converterBloc, true, "€");
+                }
+                return Container();
+              },
             ),
           ),
         ));
   }
 }
 
+Column buildBody(Items item, BuildContext context, ConverterBloc converterBloc,
+    bool convert, String currency) {
+  String format = item.logoUrl.substring(item.logoUrl.length - 3);
+  ChartBloc chartBloc = sl<ChartBloc>();
+  IntervalBloc intervalBloc = sl<IntervalBloc>();
+  DateTime today = new DateTime.now();
+  TextStyle defaultStyle = TextStyle(fontSize: 16);
+  ItemsInterval interval;
+
+  return Column(
+    mainAxisAlignment: MainAxisAlignment.start,
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Flexible(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  item.name,
+                  style: TextStyle(fontSize: 35, fontWeight: FontWeight.w600),
+                ),
+                Text(item.currency + " • " + item.status,
+                    style: TextStyle(fontSize: 18)),
+              ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(right: 8.0, top: 2.0),
+            child: SizedBox(
+              width: MediaQuery.of(context).size.height * 0.10,
+              height: MediaQuery.of(context).size.height * 0.10,
+              child: (format == 'svg')
+                  ? SvgPicture.network(
+                      item.logoUrl,
+                      fit: BoxFit.fill,
+                    )
+                  : Image.network(
+                      item.logoUrl,
+                      fit: BoxFit.fill,
+                    ),
+            ),
+          ),
+        ],
+      ),
+      SizedBox(
+        height: 15,
+      ),
+      Text(
+        double.parse(item.price).toStringAsFixed(3) + currency,
+        style: TextStyle(fontSize: 26),
+      ),
+      BlocBuilder<IntervalBloc, IntervalState>(
+        bloc: intervalBloc,
+        builder: (context, state) {
+          if (state is OneDayState) {
+            interval = item.the1D;
+            return buildInterval(context, interval, item, chartBloc, today, 1,
+                intervalBloc, converterBloc, convert, currency);
+          }
+          if (state is OneWeekState) {
+            interval = item.the7D;
+            return buildInterval(context, interval, item, chartBloc, today, 7,
+                intervalBloc, converterBloc, convert, currency);
+          }
+          if (state is OneMonthState) {
+            interval = item.the30D;
+            return buildInterval(context, interval, item, chartBloc, today, 30,
+                intervalBloc, converterBloc, convert, currency);
+          }
+          if (state is OneYearState) {
+            interval = item.the365D;
+            return buildInterval(context, interval, item, chartBloc, today, 365,
+                intervalBloc, converterBloc, convert, currency);
+          }
+          if (state is YearToDayState) {
+            interval = item.ytd;
+            return buildInterval(context, interval, item, chartBloc, today, 0,
+                intervalBloc, converterBloc, convert, currency);
+          }
+          return Container();
+        },
+      ),
+      SizedBox(
+        height: 15,
+      ),
+      Text(
+        "Circulating supply: " + formatLongNumber(item.circulatingSupply),
+        style: defaultStyle,
+      ),
+      SizedBox(
+        height: 5,
+      ),
+      item.maxSupply != null
+          ? Text("Max supply: " + formatLongNumber(item.maxSupply),
+              style: defaultStyle)
+          : Text("Max supply: " + " - ", style: defaultStyle),
+      SizedBox(height: 5),
+      Divider(),
+      SizedBox(
+        height: 5,
+      ),
+      Text(
+        "All time high: " +
+            NumberFormat("###,##0.00").format(double.parse(item.high)) +
+            " $currency",
+        style: defaultStyle,
+      ),
+      Text(
+        "Date: " +
+            item.highTimestamp
+                .toIso8601String()
+                .substring(0, 10)
+                .replaceAll("-", "/"),
+        style: defaultStyle,
+      ),
+      SizedBox(height: 5),
+      Divider(),
+      SizedBox(
+        height: 5,
+      ),
+      Text("Num exchanges: " + item.numExchanges, style: defaultStyle),
+      Text("Num pairs: " + item.numPairs, style: defaultStyle),
+      Text("Num pairs unmapped: " + item.numPairsUnmapped, style: defaultStyle),
+      SizedBox(height: 5),
+      Divider(),
+      SizedBox(
+        height: 5,
+      ),
+      Text(
+          "First trade: " +
+              item.firstTrade
+                  .toIso8601String()
+                  .substring(0, 10)
+                  .replaceAll("-", "/"),
+          style: defaultStyle),
+      Text(
+          "First candle: " +
+              item.firstCandle
+                  .toIso8601String()
+                  .substring(0, 10)
+                  .replaceAll("-", "/"),
+          style: defaultStyle),
+      Text(
+          "First order book: " +
+              item.firstOrderBook
+                  .toIso8601String()
+                  .substring(0, 10)
+                  .replaceAll("-", "/"),
+          style: defaultStyle),
+      SizedBox(height: 10),
+    ],
+  );
+}
+
 class buildSwitchCurrencies extends StatelessWidget {
-  const buildSwitchCurrencies({
-    Key key,
-  }) : super(key: key);
+  const buildSwitchCurrencies(
+      {Key key,
+      @required this.converterBloc,
+      @required this.itemId,
+      this.switchNum})
+      : super(key: key);
+
+  final ConverterBloc converterBloc;
+  final String itemId;
+  final bool switchNum;
 
   @override
   Widget build(BuildContext context) {
@@ -245,10 +268,14 @@ class buildSwitchCurrencies extends StatelessWidget {
         inactiveBgColor: Colors.grey[300],
         totalSwitches: 2,
         cornerRadius: 25,
-        initialLabelIndex: 0,
+        initialLabelIndex: switchNum ? 1 : 0,
         labels: ['\$', '€'],
         onToggle: (index) {
-          print(index);
+          if (index == 0) {
+            converterBloc.add(SwitchToUsdEvent());
+          } else {
+            converterBloc.add(SwitchToEurEvent(itemId: itemId));
+          }
         },
       ),
     );
@@ -282,8 +309,17 @@ class buildSwitchInterval extends StatelessWidget {
   }
 }
 
-Column buildInterval(BuildContext context, ItemsInterval interval, Items item,
-    ChartBloc chartBloc, DateTime today, int days, IntervalBloc intervalBloc) {
+Column buildInterval(
+    BuildContext context,
+    ItemsInterval interval,
+    Items item,
+    ChartBloc chartBloc,
+    DateTime today,
+    int days,
+    IntervalBloc intervalBloc,
+    ConverterBloc converterBloc,
+    bool convert,
+    String currency) {
   List<FlSpot> data = [];
   DateTime chartInterval;
   (days == 0)
@@ -293,7 +329,7 @@ Column buildInterval(BuildContext context, ItemsInterval interval, Items item,
   return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
     Row(
       children: [
-        Text(formatNumber(interval.priceChange),
+        Text(formatNumber(interval.priceChange) + currency,
             style: styleText(interval.priceChange)),
         SizedBox(width: 15),
         Text(formatPercentage(interval.priceChangePct),
@@ -314,7 +350,8 @@ Column buildInterval(BuildContext context, ItemsInterval interval, Items item,
         bloc: chartBloc
           ..add(GetChartEvent(
               itemId: item.id,
-              interval: chartInterval.toUtc().toIso8601String())),
+              interval: chartInterval.toUtc().toIso8601String(),
+              convert: convert)),
         buildWhen: (previous, current) {
           if (previous is ChartLoadedState) {
             return false;
@@ -370,16 +407,19 @@ Column buildInterval(BuildContext context, ItemsInterval interval, Items item,
                                     .toString()
                                     .substring(0, 10) +
                                 "\n",
-                            TextStyle(fontSize: 10, color: Colors.black),
+                            TextStyle(fontSize: 13, color: Colors.black),
                             children: [
                               TextSpan(
-                                  text: flSpot.y.toStringAsFixed(3) + " \$")
+                                  text: flSpot.y.toStringAsFixed(3) + currency)
                             ]);
                       }).toList();
                     })),
                     titlesData: FlTitlesData(show: false),
                     lineBarsData: [
-                      LineChartBarData(spots: data, barWidth: 2),
+                      LineChartBarData(
+                          spots: data,
+                          barWidth: 2,
+                          dotData: FlDotData(show: false)),
                     ],
                     borderData: FlBorderData(show: false),
                     gridData: FlGridData(show: false),
@@ -398,11 +438,15 @@ Column buildInterval(BuildContext context, ItemsInterval interval, Items item,
     SizedBox(
       height: 25,
     ),
-    buildSwitchCurrencies(),
+    buildSwitchCurrencies(
+      converterBloc: converterBloc,
+      itemId: item.id.toString(),
+      switchNum: convert,
+    ),
     SizedBox(
       height: 10,
     ),
-    Text("Volume: " + formatLongNumber(interval.volume),
+    Text("Volume: " + currency + formatLongNumber(interval.volume),
         style: TextStyle(fontSize: 20)),
     Row(
       children: [
@@ -411,9 +455,10 @@ Column buildInterval(BuildContext context, ItemsInterval interval, Items item,
           style: TextStyle(fontSize: 18),
         ),
         Text(
-            formatLongNumber(
-              interval.volumeChange,
-            ),
+            currency +
+                formatLongNumber(
+                  interval.volumeChange,
+                ),
             style: styleText(interval.volumeChange)),
         SizedBox(width: 15),
         Text(formatPercentage(interval.volumeChangePct),
@@ -423,7 +468,7 @@ Column buildInterval(BuildContext context, ItemsInterval interval, Items item,
     SizedBox(
       height: 10,
     ),
-    Text("Market cap: " + formatLongNumber(item.marketCap),
+    Text("Market cap: " + currency + formatLongNumber(item.marketCap),
         style: TextStyle(fontSize: 20)),
     Row(
       children: [
@@ -431,7 +476,7 @@ Column buildInterval(BuildContext context, ItemsInterval interval, Items item,
           "Change: ",
           style: TextStyle(fontSize: 18),
         ),
-        Text(formatLongNumber(interval.marketCapChange),
+        Text(currency + formatLongNumber(interval.marketCapChange),
             style: styleText(interval.marketCapChange)),
         SizedBox(width: 15),
         Text(
