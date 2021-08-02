@@ -20,9 +20,13 @@ class CryptoItem extends StatelessWidget {
           height: MediaQuery.of(context).size.height * 0.15,
           width: MediaQuery.of(context).size.width,
           child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Padding(
-                padding: const EdgeInsets.only(left: 15.0),
+                padding: const EdgeInsets.only(
+                  left: 15.0,
+                ),
                 child: Container(
                   width: MediaQuery.of(context).size.height * 0.10,
                   height: MediaQuery.of(context).size.height * 0.10,
@@ -38,11 +42,22 @@ class CryptoItem extends StatelessWidget {
                 ),
               ),
               SizedBox(width: 30),
-              Text(item.name),
+              Expanded(
+                child: Text(
+                  item.name,
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w400),
+                ),
+              ),
               SizedBox(
                 width: 15,
               ),
-              Text(num.parse(item.price).toStringAsFixed(3) + " \$")
+              Padding(
+                padding: const EdgeInsets.only(right: 15.0),
+                child: Text(
+                  num.parse(item.price).toStringAsFixed(3) + " \$",
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+                ),
+              ),
             ],
           ),
         ),

@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pinput/pin_put/pin_put.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 import '../../../../injection_container.dart';
 
@@ -64,7 +65,7 @@ class _AuthPageState extends State<AuthPage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      'You must verify your phone number',
+                      "must_verify".tr(),
                       style: TextStyle(fontSize: 20),
                     ),
                     SizedBox(height: 40),
@@ -103,7 +104,7 @@ class _AuthPageState extends State<AuthPage> {
                               phoneNumber: phoneNumber.toString()));
                         },
                         child: Text(
-                          'Send code',
+                          "send".tr(),
                           style: TextStyle(color: Colors.blue, fontSize: 18),
                         ))
                   ]),
@@ -113,8 +114,7 @@ class _AuthPageState extends State<AuthPage> {
               child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text('Enter the code from the SMS',
-                        style: TextStyle(fontSize: 20)),
+                    Text('enter_sms'.tr(), style: TextStyle(fontSize: 20)),
                     SizedBox(height: 40),
                     SizedBox(
                         width: MediaQuery.of(context).size.width * 0.8,
@@ -155,7 +155,7 @@ class _AuthPageState extends State<AuthPage> {
                           authBloc.add(VerifyEvent(smsCode: smsCode));
                           //Bloc
                         },
-                        child: Text('Verify',
+                        child: Text('verify'.tr(),
                             style:
                                 TextStyle(color: Colors.blue, fontSize: 18))),
                     TextButton.icon(
@@ -178,7 +178,7 @@ class _AuthPageState extends State<AuthPage> {
                                 authBloc.add(ResendCodeEvent());
                               },
                         label: Text(
-                          'Resend Code',
+                          'resend'.tr(),
                           style: TextStyle(fontSize: 16),
                         ))
                   ]),

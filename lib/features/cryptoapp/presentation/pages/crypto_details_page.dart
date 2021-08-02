@@ -12,6 +12,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
 import 'package:toggle_switch/toggle_switch.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 import '../../../../injection_container.dart';
 
@@ -112,7 +113,7 @@ Column buildBody(Items item, BuildContext context, ConverterBloc converterBloc,
                   item.name,
                   style: TextStyle(fontSize: 35, fontWeight: FontWeight.w600),
                 ),
-                Text(item.currency + " • " + item.status,
+                Text(item.currency + " • " + item.status.tr(),
                     style: TextStyle(fontSize: 18)),
               ],
             ),
@@ -177,33 +178,33 @@ Column buildBody(Items item, BuildContext context, ConverterBloc converterBloc,
         height: 15,
       ),
       Text(
-        "Circulating supply: " + formatLongNumber(item.circulatingSupply),
+        "circ_supply".tr() + formatLongNumber(item.circulatingSupply),
         style: defaultStyle,
       ),
       SizedBox(
         height: 5,
       ),
       item.maxSupply != null
-          ? Text("Max supply: " + formatLongNumber(item.maxSupply),
+          ? Text("max_supply".tr() + formatLongNumber(item.maxSupply),
               style: defaultStyle)
-          : Text("Max supply: " + " - ", style: defaultStyle),
+          : Text("max_supply".tr() + " - ", style: defaultStyle),
       SizedBox(height: 5),
       Divider(),
       SizedBox(
         height: 5,
       ),
       Text(
-        "All time high: " +
+        "highest".tr() +
             NumberFormat("###,##0.00").format(double.parse(item.high)) +
             " $currency",
         style: defaultStyle,
       ),
       Text(
-        "Date: " +
+        "date".tr() +
             item.highTimestamp
                 .toIso8601String()
                 .substring(0, 10)
-                .replaceAll("-", "/"),
+                .replaceAll("-", "."),
         style: defaultStyle,
       ),
       SizedBox(height: 5),
@@ -211,34 +212,34 @@ Column buildBody(Items item, BuildContext context, ConverterBloc converterBloc,
       SizedBox(
         height: 5,
       ),
-      Text("Num exchanges: " + item.numExchanges, style: defaultStyle),
-      Text("Num pairs: " + item.numPairs, style: defaultStyle),
-      Text("Num pairs unmapped: " + item.numPairsUnmapped, style: defaultStyle),
+      Text("num_exch".tr() + item.numExchanges, style: defaultStyle),
+      Text("num_pairs".tr() + item.numPairs, style: defaultStyle),
+      Text("num_pairs_unmap".tr() + item.numPairsUnmapped, style: defaultStyle),
       SizedBox(height: 5),
       Divider(),
       SizedBox(
         height: 5,
       ),
       Text(
-          "First trade: " +
+          "first_trade".tr() +
               item.firstTrade
                   .toIso8601String()
                   .substring(0, 10)
-                  .replaceAll("-", "/"),
+                  .replaceAll("-", "."),
           style: defaultStyle),
       Text(
-          "First candle: " +
+          "first_candle".tr() +
               item.firstCandle
                   .toIso8601String()
                   .substring(0, 10)
-                  .replaceAll("-", "/"),
+                  .replaceAll("-", "."),
           style: defaultStyle),
       Text(
-          "First order book: " +
+          "first_order".tr() +
               item.firstOrderBook
                   .toIso8601String()
                   .substring(0, 10)
-                  .replaceAll("-", "/"),
+                  .replaceAll("-", "."),
           style: defaultStyle),
       SizedBox(height: 10),
     ],
@@ -336,7 +337,7 @@ Column buildInterval(
         Padding(
           padding: const EdgeInsets.only(right: 8.0),
           child: Text(
-            "Rank #" + item.rank,
+            "rank".tr() + item.rank,
             textAlign: TextAlign.end,
             style: TextStyle(fontSize: 18),
           ),
@@ -391,32 +392,48 @@ Column buildInterval(
                   LineChartData(
                     minY: min * 0.99,
                     maxY: max * 1.01,
-                    lineTouchData: LineTouchData(getTouchLineStart:
-                        (data, index) {
-                      return 0;
-                    }, getTouchLineEnd: (data, index) {
-                      return double.infinity;
-                    }, touchTooltipData: LineTouchTooltipData(
-                        getTooltipItems: (List<LineBarSpot> touchedBarSpots) {
-                      return touchedBarSpots.map((barSpot) {
-                        final flSpot = barSpot;
-                        return LineTooltipItem(
-                            state.chart[0].timestamps[flSpot.x.toInt()]
-                                    .toString()
-                                    .substring(0, 10) +
-                                "\n",
-                            TextStyle(fontSize: 13, color: Colors.black),
-                            children: [
-                              TextSpan(
-                                  text: flSpot.y.toStringAsFixed(3) + currency)
-                            ]);
-                      }).toList();
-                    })),
+                    lineTouchData: LineTouchData(
+                        getTouchLineStart: (data, index) {
+                          return 0;
+                        },
+                        getTouchLineEnd: (data, index) {
+                          return double.infinity;
+                        },
+                        touchTooltipData: LineTouchTooltipData(
+                            tooltipBgColor: Color.fromRGBO(255, 204, 0, 1),
+                            fitInsideHorizontally: true,
+                            getTooltipItems:
+                                (List<LineBarSpot> touchedBarSpots) {
+                              return touchedBarSpots.map((barSpot) {
+                                final flSpot = barSpot;
+                                return LineTooltipItem(
+                                    (days == 1)
+                                        ? state.chart[0]
+                                                .timestamps[flSpot.x.toInt()]
+                                                .toString()
+                                                .substring(11, 16) +
+                                            "\n"
+                                        : state.chart[0]
+                                                .timestamps[flSpot.x.toInt()]
+                                                .toString()
+                                                .substring(0, 10)
+                                                .replaceAll("-", ".") +
+                                            "\n",
+                                    TextStyle(
+                                        fontSize: 15,
+                                        color: Color.fromRGBO(0, 0, 132, 1)),
+                                    children: [
+                                      TextSpan(
+                                          text: flSpot.y.toStringAsFixed(3) +
+                                              currency)
+                                    ]);
+                              }).toList();
+                            })),
                     titlesData: FlTitlesData(show: false),
                     lineBarsData: [
                       LineChartBarData(
                           spots: data,
-                          barWidth: 2,
+                          barWidth: 3,
                           dotData: FlDotData(show: false)),
                     ],
                     borderData: FlBorderData(show: false),
@@ -444,12 +461,12 @@ Column buildInterval(
     SizedBox(
       height: 10,
     ),
-    Text("Volume: " + currency + formatLongNumber(interval.volume),
+    Text("volume".tr() + currency + formatLongNumber(interval.volume),
         style: TextStyle(fontSize: 20)),
     Row(
       children: [
         Text(
-          "Change: ",
+          "change".tr(),
           style: TextStyle(fontSize: 18),
         ),
         Text(
@@ -466,12 +483,12 @@ Column buildInterval(
     SizedBox(
       height: 10,
     ),
-    Text("Market cap: " + currency + formatLongNumber(item.marketCap),
+    Text("market_cap".tr() + currency + formatLongNumber(item.marketCap),
         style: TextStyle(fontSize: 20)),
     Row(
       children: [
         Text(
-          "Change: ",
+          "change".tr(),
           style: TextStyle(fontSize: 18),
         ),
         Text(currency + formatLongNumber(interval.marketCapChange),
@@ -487,7 +504,7 @@ Column buildInterval(
       height: 5,
     ),
     Text(
-      "Dominance: " +
+      "dominance".tr() +
           NumberFormat("#0.00%").format(double.parse(item.marketCapDominance)),
       style: TextStyle(fontSize: 16),
     ),

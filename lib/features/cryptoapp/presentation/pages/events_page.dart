@@ -2,6 +2,7 @@ import 'package:cryptoapp/features/cryptoapp/presentation/bloc/auth/auth_bloc.da
 import 'package:cryptoapp/features/cryptoapp/presentation/bloc/events/events_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 import '../../../../injection_container.dart';
 
@@ -43,7 +44,7 @@ class _EventsPageState extends State<EventsPage>
                 return Center(
                   child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
-                      children: [Text('Events')]),
+                      children: [Text('events'.tr())]),
                 );
               } else if (state is LoadingEvents) {
                 return Center(
@@ -97,7 +98,8 @@ class _EventsPageState extends State<EventsPage>
                                         Text(
                                           state.event.data[i].startDate
                                               .toString()
-                                              .substring(0, 10),
+                                              .substring(0, 10)
+                                              .replaceAll("-", "."),
                                           style: TextStyle(
                                               fontSize: 15,
                                               fontWeight: FontWeight.w500,

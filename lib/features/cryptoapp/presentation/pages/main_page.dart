@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:cryptoapp/features/cryptoapp/presentation/bloc/auth/auth_bloc.dart';
 import 'package:cryptoapp/features/cryptoapp/presentation/bloc/favourites/favourites_bloc.dart';
 import 'package:cryptoapp/features/cryptoapp/presentation/bloc/items/items_bloc.dart';
@@ -7,6 +5,7 @@ import 'package:cryptoapp/features/cryptoapp/presentation/bloc/navigationbar/nav
 import 'package:cryptoapp/features/cryptoapp/presentation/pages/crypto_items.page.dart';
 import 'package:cryptoapp/features/cryptoapp/presentation/pages/events_page.dart';
 import 'package:cryptoapp/features/cryptoapp/presentation/pages/favourites_page.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -54,10 +53,53 @@ class _MainPageState extends State<MainPage> {
           child: ListView(
             padding: EdgeInsets.only(top: 50, left: 15),
             children: [
-              Text(FirebaseAuth.instance.currentUser.phoneNumber),
+              Text(
+                FirebaseAuth.instance.currentUser.phoneNumber,
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w400),
+              ),
+              SizedBox(
+                height: 5,
+              ),
+              Divider(),
+              SizedBox(
+                height: 15,
+              ),
+              Text(
+                "lang".tr(),
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500),
+              ),
+              SizedBox(
+                height: 5,
+              ),
+              ListTile(
+                title: Text(
+                  "en".tr(),
+                  style: (EasyLocalization.of(context).locale.toString() ==
+                          "en")
+                      ? TextStyle(fontSize: 17, fontWeight: FontWeight.w500)
+                      : TextStyle(fontSize: 16, fontWeight: FontWeight.w400),
+                ),
+                onTap: () {
+                  EasyLocalization.of(context).setLocale(Locale('en'));
+                },
+              ),
+              ListTile(
+                title: Text('hu'.tr(),
+                    style: (EasyLocalization.of(context).locale.toString() ==
+                            "hu")
+                        ? TextStyle(fontSize: 17, fontWeight: FontWeight.w500)
+                        : TextStyle(fontSize: 16, fontWeight: FontWeight.w400)),
+                onTap: () {
+                  EasyLocalization.of(context).setLocale(Locale('hu'));
+                },
+              ),
               Divider(),
               ListTile(
-                title: Text('Logout'),
+                leading: Icon(Icons.logout),
+                title: Text(
+                  "logout".tr(),
+                  style: TextStyle(fontSize: 16),
+                ),
                 onTap: () {
                   authBloc.add(LogoutEvent());
                 },
@@ -84,6 +126,11 @@ class _MainPageState extends State<MainPage> {
             child: PageView(
               physics: BouncingScrollPhysics(),
               controller: _pageController,
+              onPageChanged: (index) {
+                if (index == 0) navbarBloc.add(HomeSelected());
+                if (index == 1) navbarBloc.add(FavouritesSelected());
+                if (index == 2) navbarBloc.add(EventsSelected());
+              },
               children: [
                 CryptoItemsPage(
                   authBloc: authBloc,
@@ -113,24 +160,6 @@ class _MainPageState extends State<MainPage> {
             return Container();
           },
         ));
-
-    // BlocBuilder(
-    //     bloc: navbarBloc,
-    //     builder: (context, state) {
-    //       if (state is NavigationbarHome || state is NavigationbarInitial) {
-    //         return GestureDetector(
-    //           onTap: () => FocusScope.of(context).unfocus(),
-    //           child: buildHomePage(
-    //               authBloc, navbarBloc, itemsBloc, context, _textController),
-    //         );
-    //       } else if (state is NavigationbarFavourites) {
-    //         return buildFavouritesPage(authBloc, navbarBloc, favouritesBloc);
-    //       } else if (state is NavigationbarEvents) {
-    //         return buildEventsPage(authBloc, navbarBloc);
-    //       } else {
-    //         return Container();
-    //       }
-    //     });
   }
 }
 
@@ -154,10 +183,10 @@ class buildNavBar extends StatelessWidget {
         if (index == 2) navbarBloc.add(EventsSelected());
       },
       items: [
-        BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+        BottomNavigationBarItem(icon: Icon(Icons.home), label: 'home'.tr()),
         BottomNavigationBarItem(
-            icon: Icon(Icons.favorite), label: 'Favourites'),
-        BottomNavigationBarItem(icon: Icon(Icons.feed), label: 'Events'),
+            icon: Icon(Icons.favorite), label: 'favourites'.tr()),
+        BottomNavigationBarItem(icon: Icon(Icons.feed), label: 'events'.tr()),
       ],
     );
   }

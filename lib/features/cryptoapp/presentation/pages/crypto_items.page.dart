@@ -5,6 +5,7 @@ import 'package:cryptoapp/features/cryptoapp/presentation/bloc/navigationbar/nav
 import 'package:cryptoapp/features/cryptoapp/presentation/widgets/crypto_item.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class CryptoItemsPage extends StatefulWidget {
   const CryptoItemsPage(
@@ -58,18 +59,23 @@ class _CryptoItemsPageState extends State<CryptoItemsPage>
                   child: TextField(
                 controller: textController,
                 decoration: InputDecoration(
-                    labelText: 'Search Text',
+                    labelText: 'search'.tr(),
                     suffixIcon: textController.text.length > 0
-                        ? IconButton(
-                            onPressed: () {
-                              textController.clear();
-                              BlocProvider.of<ItemsBloc>(context)
-                                ..add(RefreshItemsEvent());
-                              Future.delayed(Duration.zero, () {
-                                FocusScope.of(context).unfocus();
-                              });
-                            },
-                            icon: Icon(Icons.cancel, color: Colors.grey))
+                        ? Padding(
+                            padding: EdgeInsets.only(
+                              top: 15,
+                            ),
+                            child: IconButton(
+                                onPressed: () {
+                                  textController.clear();
+                                  BlocProvider.of<ItemsBloc>(context)
+                                    ..add(RefreshItemsEvent());
+                                  Future.delayed(Duration.zero, () {
+                                    FocusScope.of(context).unfocus();
+                                  });
+                                },
+                                icon: Icon(Icons.cancel, color: Colors.grey)),
+                          )
                         : null),
                 onChanged: (value) {
                   if (value.isEmpty) {
@@ -122,7 +128,7 @@ class _CryptoItemsPageState extends State<CryptoItemsPage>
                     );
                   } else if (state is ErrorItems && _items.isEmpty) {
                     return Center(
-                      child: Text('Error loading items'),
+                      child: Text('error_load'.tr()),
                     );
                   }
                   return RefreshIndicator(

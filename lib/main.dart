@@ -4,6 +4,7 @@ import 'package:cryptoapp/features/cryptoapp/presentation/pages/crypto_details_p
 import 'package:cryptoapp/features/cryptoapp/presentation/pages/event_details_page.dart';
 import 'package:cryptoapp/features/cryptoapp/presentation/pages/main_page.dart';
 import 'package:cryptoapp/injection_container.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'features/cryptoapp/domain/usecases/get_items.dart';
@@ -14,9 +15,15 @@ import 'package:firebase_core/firebase_core.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await EasyLocalization.ensureInitialized();
   await Firebase.initializeApp();
   await di.init();
-  runApp(MyApp());
+  runApp(EasyLocalization(
+    supportedLocales: [Locale('en'), Locale('hu')],
+    fallbackLocale: Locale('en'),
+    path: 'assets/translations',
+    child: MyApp(),
+  ));
 }
 
 class MyApp extends StatelessWidget {
@@ -33,6 +40,9 @@ class MyApp extends StatelessWidget {
             theme: ThemeData(
               primarySwatch: Colors.blue,
             ),
+            locale: context.locale,
+            supportedLocales: context.supportedLocales,
+            localizationsDelegates: context.localizationDelegates,
             home: AuthPage(),
             routes: {
               '/auth': (context) => AuthPage(),

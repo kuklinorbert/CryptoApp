@@ -1,0 +1,43 @@
+{
+    "must_verify": "Kérjük adja meg a telefonszámát",
+    "send": "Kód küldése",
+    "enter_sms": "Írja be az SMS-ben kapott kódot",
+    "verify": "Megerősítés",
+    "resend": "Kód újraküldése",
+
+    "lang": "Nyelv",
+    "en": "🇬🇧  Angol",
+    "hu": "🇭🇺  Magyar",
+    "logout": "Kijelentkezés",
+
+    "home": "Otthon",
+    "favourites": "Kedvencek",
+    "events": "Események",
+
+    "no_fav": "Nem lett még kedvenc hozzáadva!",
+
+    "search": "Keresés",
+
+    "circ_supply": "Forgalomban lévő kínálat: ",
+    "max_supply": "Teljes kínálat: ",
+    "highest": "Legmagasabb ár: ",
+    "num_exch": "Cserék száma: ",
+    "num_pairs": "Párok száma: ",
+    "num_pairs_unmap": "Feltérképezetlen párok száma: ",
+    "first_trade": "Első kereskedés: ",
+    "first_candle": "Első gyertya: ",
+    "first_order": "Első rendelési könyv: ",
+    "rank": "Helyezés #",
+    "volume": "Volumen: ",
+    "change": "Változás: ",
+    "market_cap": "Kapitalizáció: ",
+    "dominance": "Dominancia: ",
+    "date": "Dátum: ",
+
+    "active": "aktív",
+    "inactive": "inaktív",
+    "dead": "halott",
+
+    "error_load": "Hiba a betöltés közben"
+
+}
