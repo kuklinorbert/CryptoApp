@@ -31,11 +31,9 @@ class CryptoDetailsPage extends StatelessWidget {
           actions: [
             BlocBuilder<FavouritesBloc, FavouritesState>(
                 bloc: favouritesBloc
-
-                // ..add(CheckFavouriteEvent(
-                //     uid: FirebaseAuth.instance.currentUser.uid,
-                //     itemId: item.id))
-                ,
+                  ..add(CheckFavouriteEvent(
+                      uid: FirebaseAuth.instance.currentUser.uid,
+                      itemId: item.id)),
                 buildWhen: (previous, current) {
                   if (current is LoadingFavouritesState ||
                       current is FavouritesFetchedState) {

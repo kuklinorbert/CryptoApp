@@ -15,6 +15,8 @@ abstract class FavouritesDataSource {
 
 class FavouritesDataSourceImpl implements FavouritesDataSource {
   final http.Client client;
+  final List<ItemsModel> empty = [];
+  final FavouritesModel emptyFav = FavouritesModel(favourites: []);
 
   FavouritesDataSourceImpl({@required this.client});
 
@@ -30,13 +32,18 @@ class FavouritesDataSourceImpl implements FavouritesDataSource {
     final response =
         await client.get(url, headers: {'Content-Type': 'application/json'});
     if (response.statusCode == 200) {
-      FavouritesModel model = favouritesModelFromJson(response.body);
-      for (final fav in model.favourites) {
-        uriItems = uriItems + fav.toUpperCase() + ',';
+      if (response.body == "null") {
+        return empty;
+      } else {
+        FavouritesModel model = favouritesModelFromJson(response.body);
+        for (final fav in model.favourites) {
+          uriItems = uriItems + fav.toUpperCase() + ',';
+        }
       }
     } else {
       throw ServerException();
     }
+
     final urlFinal = Uri.parse(uriItems);
 
     final responseFinal = await client
@@ -90,7 +97,11 @@ class FavouritesDataSourceImpl implements FavouritesDataSource {
     final response =
         await client.get(url, headers: {'Content-Type': 'application/json'});
     if (response.statusCode == 200) {
-      return favouritesModelFromJson(response.body);
+      if (response.body == "null") {
+        return emptyFav;
+      } else {
+        return favouritesModelFromJson(response.body);
+      }
     } else {
       throw ServerException();
     }

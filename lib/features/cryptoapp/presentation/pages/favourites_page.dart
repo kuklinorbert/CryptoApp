@@ -59,14 +59,21 @@ class _FavouritesPage1State extends State<FavouritesPage>
                 if (state is FavouritesFetchedState) {
                   return Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: ListView.separated(
-                        physics: AlwaysScrollableScrollPhysics(),
-                        itemBuilder: (context, index) {
-                          return CryptoItem(state.favourites[index]);
-                        },
-                        separatorBuilder: (context, index) =>
-                            const SizedBox(height: 10),
-                        itemCount: state.favourites.length),
+                    child: (state.favourites.isEmpty)
+                        ? Center(
+                            child: Text(
+                              'No favourites added yet',
+                              style: TextStyle(fontSize: 20),
+                            ),
+                          )
+                        : ListView.separated(
+                            physics: AlwaysScrollableScrollPhysics(),
+                            itemBuilder: (context, index) {
+                              return CryptoItem(state.favourites[index]);
+                            },
+                            separatorBuilder: (context, index) =>
+                                const SizedBox(height: 10),
+                            itemCount: state.favourites.length),
                   );
                 }
                 return Center(

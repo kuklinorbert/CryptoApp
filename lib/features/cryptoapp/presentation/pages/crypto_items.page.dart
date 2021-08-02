@@ -40,120 +40,124 @@ class _CryptoItemsPageState extends State<CryptoItemsPage>
 
     List<Items> _items = [];
 
-    return BlocListener<AuthBloc, AuthState>(
-      bloc: widget.authBloc,
-      listener: (context, state) {
-        if (state is Unauthenticated) {
-          Navigator.of(context)
-              .pushNamedAndRemoveUntil('/auth', (route) => false);
-        }
-      },
-      child: Column(children: [
-        Padding(
-          padding: const EdgeInsets.all(10.0),
-          child: Row(children: [
-            Flexible(
-                child: TextField(
-              controller: textController,
-              decoration: InputDecoration(
-                  labelText: 'Search Text',
-                  suffixIcon: textController.text.length > 0
-                      ? IconButton(
-                          onPressed: () {
-                            textController.clear();
-                            BlocProvider.of<ItemsBloc>(context)
-                              ..add(CancelSearchEvent());
-                            Future.delayed(Duration.zero, () {
-                              FocusScope.of(context).unfocus();
-                            });
-                          },
-                          icon: Icon(Icons.cancel, color: Colors.grey))
-                      : null),
-              onChanged: (value) {
-                if (value.isEmpty) {
-                  BlocProvider.of<ItemsBloc>(context)..add(CancelSearchEvent());
-                  FocusScope.of(context).unfocus();
-                }
-              },
-              onSubmitted: (value) {
-                BlocProvider.of<ItemsBloc>(context)
-                  ..add(GetSearchedItemEvent(searchText: value));
-              },
-            )),
-            IconButton(icon: Icon(Icons.sort), onPressed: () {}),
-            IconButton(
-              icon: Icon(Icons.attach_money),
-              onPressed: () {},
-            ),
-            IconButton(
-                icon: Icon(Icons.local_fire_department), onPressed: () {}),
-          ]),
-        ),
-        Expanded(
-          child: BlocConsumer<ItemsBloc, ItemsState>(
-              listener: (context, state) {},
-              builder: (context, state) {
-                if (state is LoadingItems && _items.isEmpty ||
-                    state is LoadingSearchResult) {
-                  return Center(child: CircularProgressIndicator());
-                } else if (state is LoadedItems) {
-                  _items = state.items;
-                  widget.itemsBloc.isFetching = false;
-                } else if (state is LoadedSearchItem) {
-                  return Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: RefreshIndicator(
-                      onRefresh: () async {
-                        BlocProvider.of<ItemsBloc>(context)
-                          ..add(RefreshSearchEvent());
-                      },
+    return GestureDetector(
+      onTap: () => FocusScope.of(context).unfocus(),
+      child: BlocListener<AuthBloc, AuthState>(
+        bloc: widget.authBloc,
+        listener: (context, state) {
+          if (state is Unauthenticated) {
+            Navigator.of(context)
+                .pushNamedAndRemoveUntil('/auth', (route) => false);
+          }
+        },
+        child: Column(children: [
+          Padding(
+            padding: const EdgeInsets.all(10.0),
+            child: Row(children: [
+              Flexible(
+                  child: TextField(
+                controller: textController,
+                decoration: InputDecoration(
+                    labelText: 'Search Text',
+                    suffixIcon: textController.text.length > 0
+                        ? IconButton(
+                            onPressed: () {
+                              textController.clear();
+                              BlocProvider.of<ItemsBloc>(context)
+                                ..add(RefreshItemsEvent());
+                              Future.delayed(Duration.zero, () {
+                                FocusScope.of(context).unfocus();
+                              });
+                            },
+                            icon: Icon(Icons.cancel, color: Colors.grey))
+                        : null),
+                onChanged: (value) {
+                  if (value.isEmpty) {
+                    BlocProvider.of<ItemsBloc>(context)
+                      ..add(CancelSearchEvent());
+                    FocusScope.of(context).unfocus();
+                  }
+                },
+                onSubmitted: (value) {
+                  BlocProvider.of<ItemsBloc>(context)
+                    ..add(GetSearchedItemEvent(searchText: value));
+                },
+              )),
+              IconButton(icon: Icon(Icons.sort), onPressed: () {}),
+              IconButton(
+                icon: Icon(Icons.attach_money),
+                onPressed: () {},
+              ),
+              IconButton(
+                  icon: Icon(Icons.local_fire_department), onPressed: () {}),
+            ]),
+          ),
+          Expanded(
+            child: BlocConsumer<ItemsBloc, ItemsState>(
+                listener: (context, state) {},
+                builder: (context, state) {
+                  if (state is LoadingItems && _items.isEmpty ||
+                      state is LoadingSearchResult) {
+                    return Center(child: CircularProgressIndicator());
+                  } else if (state is LoadedItems) {
+                    _items = state.items;
+                    widget.itemsBloc.isFetching = false;
+                  } else if (state is LoadedSearchItem) {
+                    return Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: RefreshIndicator(
+                        onRefresh: () async {
+                          BlocProvider.of<ItemsBloc>(context)
+                            ..add(RefreshSearchEvent());
+                        },
+                        child: ListView.separated(
+                            physics: AlwaysScrollableScrollPhysics(),
+                            itemBuilder: (context, index) {
+                              return CryptoItem(state.searchedItem[index]);
+                            },
+                            separatorBuilder: (context, index) =>
+                                const SizedBox(height: 10),
+                            itemCount: state.searchedItem.length),
+                      ),
+                    );
+                  } else if (state is ErrorItems && _items.isEmpty) {
+                    return Center(
+                      child: Text('Error loading items'),
+                    );
+                  }
+                  return RefreshIndicator(
+                    onRefresh: () async {
+                      BlocProvider.of<ItemsBloc>(context)
+                        ..add(RefreshItemsEvent());
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.all(8),
                       child: ListView.separated(
-                          physics: AlwaysScrollableScrollPhysics(),
+                          controller: _scrollController
+                            ..addListener(() {
+                              if (_scrollController.offset ==
+                                      _scrollController
+                                          .position.maxScrollExtent &&
+                                  !widget.itemsBloc.isFetching) {
+                                BlocProvider.of<ItemsBloc>(context)
+                                    .add(GetItemsEvent());
+                                widget.itemsBloc.isFetching = true;
+                              }
+                            }),
                           itemBuilder: (context, index) {
-                            return CryptoItem(state.searchedItem[index]);
+                            return index >= _items.length - 1
+                                ? Center(child: CircularProgressIndicator())
+                                : CryptoItem(_items[index]);
                           },
                           separatorBuilder: (context, index) =>
                               const SizedBox(height: 10),
-                          itemCount: state.searchedItem.length),
+                          itemCount: _items.length),
                     ),
                   );
-                } else if (state is ErrorItems && _items.isEmpty) {
-                  return Center(
-                    child: Text('Error loading items'),
-                  );
-                }
-                return RefreshIndicator(
-                  onRefresh: () async {
-                    BlocProvider.of<ItemsBloc>(context)
-                      ..add(RefreshItemsEvent());
-                  },
-                  child: Padding(
-                    padding: const EdgeInsets.all(8),
-                    child: ListView.separated(
-                        controller: _scrollController
-                          ..addListener(() {
-                            if (_scrollController.offset ==
-                                    _scrollController
-                                        .position.maxScrollExtent &&
-                                !widget.itemsBloc.isFetching) {
-                              BlocProvider.of<ItemsBloc>(context)
-                                  .add(GetItemsEvent());
-                              widget.itemsBloc.isFetching = true;
-                            }
-                          }),
-                        itemBuilder: (context, index) {
-                          return index >= _items.length - 1
-                              ? Center(child: CircularProgressIndicator())
-                              : CryptoItem(_items[index]);
-                        },
-                        separatorBuilder: (context, index) =>
-                            const SizedBox(height: 10),
-                        itemCount: _items.length),
-                  ),
-                );
-              }),
-        ),
-      ]),
+                }),
+          ),
+        ]),
+      ),
     );
   }
 }
