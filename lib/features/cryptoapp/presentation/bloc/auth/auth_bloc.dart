@@ -38,7 +38,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         _verifyCode = verifyCode,
         _logout = logout,
         _resendCode = resendCode,
-        super(AuthInitial());
+        super(CheckAuthState());
+
+  @override
+  AuthState get initialState => CheckAuthState();
 
   StreamSubscription subscription;
   String verID = "";
@@ -55,6 +58,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       final result = await _checkAuth.call(NoParams());
       yield* _eitherAuthOrErrorState(result);
     } else if (event is SendCodeEvent) {
+      print('hmmm');
       subscription = sendCode(event.phoneNumber).listen((event) {
         add(event);
       });
@@ -105,7 +109,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       Either<Failure, UserCredential> failureOrLogin) async* {
     yield failureOrLogin.fold(
         (failure) => ErrorLoggedState(message: _mapFailureToMessage(failure)),
-        (login) => Authenticated());
+        (login) {
+      return Authenticated();
+    });
   }
 
   Stream<AuthState> _eitherAuthOrErrorState(

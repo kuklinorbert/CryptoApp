@@ -99,68 +99,91 @@ class _CryptoItemsPageState extends State<CryptoItemsPage>
             ]),
           ),
           Expanded(
-            child: BlocConsumer<ItemsBloc, ItemsState>(
-                listener: (context, state) {},
-                builder: (context, state) {
-                  if (state is LoadingItems && _items.isEmpty ||
-                      state is LoadingSearchResult) {
-                    return Center(child: CircularProgressIndicator());
-                  } else if (state is LoadedItems) {
-                    _items = state.items;
-                    widget.itemsBloc.isFetching = false;
-                  } else if (state is LoadedSearchItem) {
-                    return Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: RefreshIndicator(
-                        onRefresh: () async {
-                          BlocProvider.of<ItemsBloc>(context)
-                            ..add(RefreshSearchEvent());
-                        },
-                        child: ListView.separated(
-                            physics: AlwaysScrollableScrollPhysics(),
-                            itemBuilder: (context, index) {
-                              return CryptoItem(state.searchedItem[index]);
-                            },
-                            separatorBuilder: (context, index) =>
-                                const SizedBox(height: 10),
-                            itemCount: state.searchedItem.length),
-                      ),
-                    );
-                  } else if (state is ErrorItems && _items.isEmpty) {
-                    return Center(
-                      child: Text('error_load'.tr()),
-                    );
-                  }
-                  return RefreshIndicator(
+            child:
+                BlocConsumer<ItemsBloc, ItemsState>(listener: (context, state) {
+              print(state);
+            }, builder: (context, state) {
+              if (state is LoadingItems && _items.isEmpty ||
+                  state is LoadingSearchResult) {
+                return Center(child: CircularProgressIndicator());
+              } else if (state is LoadedItems) {
+                _items = state.items;
+                widget.itemsBloc.isFetching = false;
+              } else if (state is LoadedSearchItem) {
+                return Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: RefreshIndicator(
                     onRefresh: () async {
                       BlocProvider.of<ItemsBloc>(context)
-                        ..add(RefreshItemsEvent());
+                        ..add(RefreshSearchEvent());
                     },
-                    child: Padding(
-                      padding: const EdgeInsets.all(8),
-                      child: ListView.separated(
-                          controller: _scrollController
-                            ..addListener(() {
-                              if (_scrollController.offset ==
-                                      _scrollController
-                                          .position.maxScrollExtent &&
-                                  !widget.itemsBloc.isFetching) {
-                                BlocProvider.of<ItemsBloc>(context)
-                                    .add(GetItemsEvent());
-                                widget.itemsBloc.isFetching = true;
-                              }
-                            }),
-                          itemBuilder: (context, index) {
-                            return index >= _items.length - 1
-                                ? Center(child: CircularProgressIndicator())
-                                : CryptoItem(_items[index]);
-                          },
-                          separatorBuilder: (context, index) =>
-                              const SizedBox(height: 10),
-                          itemCount: _items.length),
-                    ),
-                  );
-                }),
+                    child: ListView.separated(
+                        physics: AlwaysScrollableScrollPhysics(),
+                        itemBuilder: (context, index) {
+                          return CryptoItem(state.searchedItem[index]);
+                        },
+                        separatorBuilder: (context, index) =>
+                            const SizedBox(height: 10),
+                        itemCount: state.searchedItem.length),
+                  ),
+                );
+              } else if (state is ErrorItems) {
+                return Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text('error_load'.tr()),
+                    IconButton(
+                      icon: Icon(Icons.refresh),
+                      onPressed: () {
+                        BlocProvider.of<ItemsBloc>(context)
+                          ..add(GetItemsEvent());
+                      },
+                    )
+                  ],
+                );
+              } else if (state is ErrorItems && _items.isEmpty) {
+                return Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text('error_load'.tr()),
+                    IconButton(
+                      icon: Icon(Icons.refresh),
+                      onPressed: () {
+                        BlocProvider.of<ItemsBloc>(context)
+                          ..add(GetItemsEvent());
+                      },
+                    )
+                  ],
+                );
+              }
+              return RefreshIndicator(
+                onRefresh: () async {
+                  BlocProvider.of<ItemsBloc>(context)..add(RefreshItemsEvent());
+                },
+                child: Padding(
+                  padding: const EdgeInsets.all(8),
+                  child: ListView.separated(
+                      controller: _scrollController
+                        ..addListener(() {
+                          if (_scrollController.offset ==
+                                  _scrollController.position.maxScrollExtent &&
+                              !widget.itemsBloc.isFetching) {
+                            BlocProvider.of<ItemsBloc>(context)
+                                .add(GetItemsEvent());
+                            widget.itemsBloc.isFetching = true;
+                          }
+                        }),
+                      itemBuilder: (context, index) {
+                        return index >= _items.length - 1
+                            ? Center(child: CircularProgressIndicator())
+                            : CryptoItem(_items[index]);
+                      },
+                      separatorBuilder: (context, index) =>
+                          const SizedBox(height: 10),
+                      itemCount: _items.length),
+                ),
+              );
+            }),
           ),
         ]),
       ),

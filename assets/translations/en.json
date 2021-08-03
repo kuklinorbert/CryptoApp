@@ -14,9 +14,16 @@
     "favourites": "Favourites",
     "events": "Events",
 
+    "done": "Done",
+    "skip": "Skip",
+    "next": "Next",
+
     "no_fav": "No favourites added yet!",
 
     "search": "Search",
+    "search_long": "Search in the criptocurrency database",
+    "favourite_long": "Add criptocurrencies to your favourites",
+    "events_long": "Read about upcoming criptocurrency events",
 
     "circ_supply": "Circulating supply: ",
     "max_supply": "Max supply: ",

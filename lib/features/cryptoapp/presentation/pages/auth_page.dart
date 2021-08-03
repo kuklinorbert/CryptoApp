@@ -25,16 +25,22 @@ class _AuthPageState extends State<AuthPage> {
 
   @override
   void initState() {
-    super.initState();
     authBloc = sl<AuthBloc>();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         body: BlocListener<AuthBloc, AuthState>(
-      bloc: sl<AuthBloc>(),
+      bloc: authBloc,
       listener: (context, state) {
+        print(state);
         if (state is Authenticated) {
           Navigator.of(context).pushReplacementNamed('/main');
         } else if (state is ErrorLoggedState) {
@@ -49,8 +55,8 @@ class _AuthPageState extends State<AuthPage> {
           resendTimes = 0;
         }
       },
-      child: BlocBuilder(
-        bloc: authBloc..add(CheckAuthEvent()),
+      child: BlocBuilder<AuthBloc, AuthState>(
+        bloc: sl<AuthBloc>()..add(CheckAuthEvent()),
         buildWhen: (previous, current) {
           if (current is ErrorLoggedState || current is VerifyErrorState) {
             return false;
@@ -59,7 +65,8 @@ class _AuthPageState extends State<AuthPage> {
           }
         },
         builder: (context, state) {
-          if (state is AuthInitial || state is Unauthenticated) {
+          print(state);
+          if (state is Unauthenticated) {
             return Center(
               child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -100,8 +107,9 @@ class _AuthPageState extends State<AuthPage> {
                             primary: Colors.white,
                             side: BorderSide(color: Colors.blue)),
                         onPressed: () {
-                          authBloc.add(SendCodeEvent(
-                              phoneNumber: phoneNumber.toString()));
+                          authBloc
+                            ..add(SendCodeEvent(
+                                phoneNumber: phoneNumber.toString()));
                         },
                         child: Text(
                           "send".tr(),

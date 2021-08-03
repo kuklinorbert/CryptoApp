@@ -38,10 +38,6 @@ class _MainPageState extends State<MainPage> {
 
   @override
   void dispose() {
-    authBloc.close();
-    navbarBloc.close();
-    itemsBloc.close();
-    favouritesBloc.close();
     super.dispose();
   }
 
@@ -101,6 +97,9 @@ class _MainPageState extends State<MainPage> {
                   style: TextStyle(fontSize: 16),
                 ),
                 onTap: () {
+                  Navigator.of(context)
+                      .pushNamedAndRemoveUntil('/auth', (route) => false);
+
                   authBloc.add(LogoutEvent());
                 },
               )

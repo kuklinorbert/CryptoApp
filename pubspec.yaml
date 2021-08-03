@@ -38,6 +38,8 @@ dependencies:
   toggle_switch: ^1.2.0
   intl: ^0.17.0
   easy_localization: ^3.0.0
+  introduction_screen: ^2.1.0
+  shared_preferences: ^2.0.6
 
 
 
@@ -48,9 +50,14 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  flutter_native_splash: ^1.2.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
+
+flutter_native_splash:
+  color: "#FFFFFF"
+  image: assets/icon/cryptoapp.png
 
 # The following section is specific to Flutter.
 flutter:
@@ -63,7 +70,10 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - assets/translations/
-  #   - images/a_dot_ham.jpeg
+    - assets/onboarding/event.png
+    - assets/onboarding/favourite1.png
+    - assets/onboarding/favourite2.png
+    - assets/onboarding/search1.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
