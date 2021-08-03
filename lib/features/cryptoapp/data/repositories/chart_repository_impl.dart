@@ -23,7 +23,9 @@ class ChartRepositoryImpl implements ChartRepository {
             await chartDataSource.getChart(itemId, interval, convert);
         return Right(result);
       } on ServerException {
-        throw Left(ServerFailure());
+        return Left(ServerFailure());
+      } on TooManyRequestException {
+        return Left(TooManyRequestFailure());
       }
     } else {
       return Left(NetworkFailure());

@@ -20,3 +20,5 @@ class NetworkFailure extends Failure {}
 class ServerFailure extends Failure {}
 
 class SearchFailure extends Failure {}
+
+class TooManyRequestFailure extends Failure {}

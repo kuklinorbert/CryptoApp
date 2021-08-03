@@ -2,10 +2,10 @@ import 'package:cryptoapp/features/cryptoapp/domain/entities/items.dart';
 import 'package:cryptoapp/features/cryptoapp/presentation/bloc/auth/auth_bloc.dart';
 import 'package:cryptoapp/features/cryptoapp/presentation/bloc/items/items_bloc.dart';
 import 'package:cryptoapp/features/cryptoapp/presentation/widgets/crypto_item.dart';
+import 'package:cryptoapp/features/cryptoapp/presentation/widgets/searchBar.dart';
 import 'package:cryptoapp/features/cryptoapp/presentation/widgets/show_snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:easy_localization/easy_localization.dart';
 
 class CryptoItemsPage extends StatefulWidget {
   const CryptoItemsPage(
@@ -39,7 +39,7 @@ class _CryptoItemsPageState extends State<CryptoItemsPage>
       setState(() {});
     });
 
-    List<Items> _items = [];
+    List<Items> items = [];
 
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
@@ -52,53 +52,7 @@ class _CryptoItemsPageState extends State<CryptoItemsPage>
           }
         },
         child: Column(children: [
-          Padding(
-            padding: const EdgeInsets.all(10.0),
-            child: Row(children: [
-              Flexible(
-                  child: TextField(
-                controller: textController,
-                decoration: InputDecoration(
-                    labelText: 'search'.tr(),
-                    suffixIcon: textController.text.length > 0
-                        ? Padding(
-                            padding: EdgeInsets.only(
-                              top: 15,
-                            ),
-                            child: IconButton(
-                                onPressed: () {
-                                  textController.clear();
-                                  LoadedItems(items: _items);
-                                  BlocProvider.of<ItemsBloc>(context)
-                                    ..add(CancelSearchEvent());
-                                  Future.delayed(Duration.zero, () {
-                                    FocusScope.of(context).unfocus();
-                                  });
-                                },
-                                icon: Icon(Icons.cancel, color: Colors.grey)),
-                          )
-                        : null),
-                onChanged: (value) {
-                  if (value.isEmpty) {
-                    BlocProvider.of<ItemsBloc>(context)
-                      ..add(CancelSearchEvent());
-                    FocusScope.of(context).unfocus();
-                  }
-                },
-                onSubmitted: (value) {
-                  BlocProvider.of<ItemsBloc>(context)
-                    ..add(GetSearchedItemEvent(searchText: value));
-                },
-              )),
-              IconButton(icon: Icon(Icons.sort), onPressed: () {}),
-              IconButton(
-                icon: Icon(Icons.attach_money),
-                onPressed: () {},
-              ),
-              IconButton(
-                  icon: Icon(Icons.local_fire_department), onPressed: () {}),
-            ]),
-          ),
+          searchBar(items, context, textController),
           Expanded(
             child:
                 BlocConsumer<ItemsBloc, ItemsState>(listener: (context, state) {
@@ -111,10 +65,10 @@ class _CryptoItemsPageState extends State<CryptoItemsPage>
                     .showSnackBar(buildSnackBar(context, state.message));
               }
             }, builder: (context, state) {
-              if (state is LoadingItems && _items.isEmpty || state is Loading) {
+              if (state is LoadingItems && items.isEmpty || state is Loading) {
                 return Center(child: CircularProgressIndicator());
               } else if (state is LoadedItems) {
-                _items = state.items;
+                items = state.items;
                 widget.itemsBloc.isFetching = false;
               } else if (state is LoadedSearchItem) {
                 return Padding(
@@ -134,7 +88,7 @@ class _CryptoItemsPageState extends State<CryptoItemsPage>
                         itemCount: state.searchedItem.length),
                   ),
                 );
-              } else if (state is ErrorItems && _items.isEmpty) {
+              } else if (state is ErrorItems && items.isEmpty) {
                 return IconButton(
                   icon: Icon(Icons.refresh),
                   onPressed: () {
@@ -151,25 +105,7 @@ class _CryptoItemsPageState extends State<CryptoItemsPage>
                 },
                 child: Padding(
                   padding: const EdgeInsets.all(8),
-                  child: ListView.separated(
-                      controller: _scrollController
-                        ..addListener(() {
-                          if (_scrollController.offset ==
-                                  _scrollController.position.maxScrollExtent &&
-                              !widget.itemsBloc.isFetching) {
-                            BlocProvider.of<ItemsBloc>(context)
-                                .add(GetItemsEvent());
-                            widget.itemsBloc.isFetching = true;
-                          }
-                        }),
-                      itemBuilder: (context, index) {
-                        return index >= _items.length - 1
-                            ? Center(child: CircularProgressIndicator())
-                            : CryptoItem(_items[index]);
-                      },
-                      separatorBuilder: (context, index) =>
-                          const SizedBox(height: 10),
-                      itemCount: _items.length),
+                  child: listViewSeparated(context, items),
                 ),
               );
             }),
@@ -177,5 +113,25 @@ class _CryptoItemsPageState extends State<CryptoItemsPage>
         ]),
       ),
     );
+  }
+
+  ListView listViewSeparated(BuildContext context, List<Items> items) {
+    return ListView.separated(
+        controller: _scrollController
+          ..addListener(() {
+            if (_scrollController.offset ==
+                    _scrollController.position.maxScrollExtent &&
+                !widget.itemsBloc.isFetching) {
+              BlocProvider.of<ItemsBloc>(context).add(GetItemsEvent());
+              widget.itemsBloc.isFetching = true;
+            }
+          }),
+        itemBuilder: (context, index) {
+          return index >= items.length - 1
+              ? Center(child: CircularProgressIndicator())
+              : CryptoItem(items[index]);
+        },
+        separatorBuilder: (context, index) => const SizedBox(height: 10),
+        itemCount: items.length);
   }
 }

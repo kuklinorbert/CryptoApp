@@ -40,7 +40,6 @@ class _AuthPageState extends State<AuthPage> {
         body: BlocListener<AuthBloc, AuthState>(
       bloc: authBloc,
       listener: (context, state) {
-        print(state);
         if (state is Authenticated) {
           Navigator.of(context).pushReplacementNamed('/main');
         } else if (state is ErrorLoggedState) {
@@ -65,7 +64,6 @@ class _AuthPageState extends State<AuthPage> {
           }
         },
         builder: (context, state) {
-          print(state);
           if (state is Unauthenticated) {
             return Center(
               child: Column(
@@ -161,7 +159,6 @@ class _AuthPageState extends State<AuthPage> {
                             side: BorderSide(color: Colors.blue)),
                         onPressed: () {
                           authBloc.add(VerifyEvent(smsCode: smsCode));
-                          //Bloc
                         },
                         child: Text('verify'.tr(),
                             style:

@@ -54,7 +54,8 @@
       "checkauth_fail": "Authentication check failure",
       "codesend_fail": "Code send failed!",
       "logout_fail": "Logout failed",
-      "verify_fail" : "Verification failure"
+      "verify_fail" : "Verification failure",
+      "error_req": "Too many requests!" 
 
 
 }

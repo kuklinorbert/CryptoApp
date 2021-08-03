@@ -19,7 +19,6 @@ class OnboardingPage extends StatelessWidget {
       int isViewed = 1;
       SharedPreferences prefs = await SharedPreferences.getInstance();
       await prefs.setInt('isViewed', isViewed);
-      print(prefs.getInt('isViewed'));
     }
 
     return IntroductionScreen(

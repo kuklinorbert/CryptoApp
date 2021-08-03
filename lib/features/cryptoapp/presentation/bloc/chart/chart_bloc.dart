@@ -25,7 +25,6 @@ class ChartBloc extends Bloc<ChartEvent, ChartState> {
     ChartEvent event,
   ) async* {
     if (event is GetChartEvent) {
-      // yield ChartLoadingState();
       final failureOrChart = await _getChart.call(Params(
           itemId: event.itemId,
           interval: event.interval,
@@ -49,6 +48,8 @@ String _mapFailureToMessage(Failure failure) {
       return "error_network".tr();
     case ServerFailure:
       return "error_server".tr();
+    case TooManyRequestFailure:
+      return "error_req".tr();
     default:
       return 'error_unexp'.tr();
   }

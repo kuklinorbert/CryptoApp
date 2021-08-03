@@ -54,7 +54,8 @@
       "checkauth_fail": "Sikertelen authentikáció!",
       "codesend_fail": "Nem sikerült elküldeni a kódot!",
       "logout_fail": "Nem sikerült kijelentkezni!",
-      "verify_fail" : "Sikertelen verifikáció!"
+      "verify_fail" : "Sikertelen verifikáció!",
+      "error_req": "Túl sok kérelem! Kérük próbálja később" 
 
 
 }

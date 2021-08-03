@@ -39,7 +39,6 @@ class _FavouritesPage1State extends State<FavouritesPage>
         child: BlocListener<FavouritesBloc, FavouritesState>(
             bloc: widget.favouritesBloc,
             listener: (context, state) {
-              print(state);
               if (state is YesFavouriteState) {
                 widget.favouritesBloc.add(GetFavouritesEvent(uid: userId));
               }

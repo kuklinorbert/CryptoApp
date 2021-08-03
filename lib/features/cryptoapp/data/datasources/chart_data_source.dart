@@ -1,4 +1,5 @@
 import 'package:cryptoapp/core/error/exceptions.dart';
+import 'package:cryptoapp/core/error/failures.dart';
 import 'package:cryptoapp/features/cryptoapp/data/models/chart_model.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
@@ -18,11 +19,9 @@ class ChartDataSourceImpl implements ChartDataSource {
       String itemId, String interval, bool convert) async {
     String url;
     if (convert) {
-      await Future.delayed(Duration(seconds: 1));
       url =
           'https://api.nomics.com/v1/currencies/sparkline?key=9b477e525212e4d0ae32ca7dd6f17f9d3e1e4c95&ids=$itemId&start=$interval&convert=EUR';
     } else {
-      await Future.delayed(Duration(seconds: 1));
       url =
           'https://api.nomics.com/v1/currencies/sparkline?key=9b477e525212e4d0ae32ca7dd6f17f9d3e1e4c95&ids=$itemId&start=$interval';
     }
@@ -33,6 +32,8 @@ class ChartDataSourceImpl implements ChartDataSource {
     //429
     if (response.statusCode == 200) {
       return chartModelFromJson(response.body);
+    } else if (response.statusCode == 429) {
+      throw TooManyRequestException();
     } else {
       throw ServerException();
     }

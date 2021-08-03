@@ -59,7 +59,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       final result = await _checkAuth.call(NoParams());
       yield* _eitherAuthOrErrorState(result);
     } else if (event is SendCodeEvent) {
-      print('hmmm');
       subscription = sendCode(event.phoneNumber).listen((event) {
         add(event);
       });
