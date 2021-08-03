@@ -1,10 +1,10 @@
 import 'package:cryptoapp/features/cryptoapp/presentation/bloc/auth/auth_bloc.dart';
 import 'package:cryptoapp/features/cryptoapp/presentation/bloc/favourites/favourites_bloc.dart';
 import 'package:cryptoapp/features/cryptoapp/presentation/widgets/crypto_item.dart';
+import 'package:cryptoapp/features/cryptoapp/presentation/widgets/show_snackbar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:easy_localization/easy_localization.dart';
 import 'package:easy_localization/easy_localization.dart';
 
 class FavouritesPage extends StatefulWidget {
@@ -27,6 +27,7 @@ class _FavouritesPage1State extends State<FavouritesPage>
   @override
   Widget build(BuildContext context) {
     super.build(context);
+    var userId = FirebaseAuth.instance.currentUser.uid;
     return BlocListener<AuthBloc, AuthState>(
         bloc: widget.authBloc,
         listener: (context, state) {
@@ -40,18 +41,18 @@ class _FavouritesPage1State extends State<FavouritesPage>
             listener: (context, state) {
               print(state);
               if (state is YesFavouriteState) {
-                widget.favouritesBloc.add(GetFavouritesEvent(
-                    uid: FirebaseAuth.instance.currentUser.uid));
+                widget.favouritesBloc.add(GetFavouritesEvent(uid: userId));
               }
               if (state is NotFavouriteState) {
-                widget.favouritesBloc.add(GetFavouritesEvent(
-                    uid: FirebaseAuth.instance.currentUser.uid));
+                widget.favouritesBloc.add(GetFavouritesEvent(uid: userId));
+              }
+              if (state is ErrorFavouritesState) {
+                ScaffoldMessenger.of(context)
+                    .showSnackBar(buildSnackBar(context, state.message));
               }
             },
             child: BlocBuilder<FavouritesBloc, FavouritesState>(
-              bloc: widget.favouritesBloc
-                ..add(GetFavouritesEvent(
-                    uid: FirebaseAuth.instance.currentUser.uid)),
+              bloc: widget.favouritesBloc..add(GetFavouritesEvent(uid: userId)),
               builder: (context, state) {
                 if (state is LoadingFavouritesState) {
                   return Center(
@@ -78,9 +79,18 @@ class _FavouritesPage1State extends State<FavouritesPage>
                             itemCount: state.favourites.length),
                   );
                 }
-                return Center(
-                  child: Text("no_fav".tr()),
-                );
+                if (state is ErrorFavouritesState) {
+                  return Center(
+                    child: IconButton(
+                      icon: Icon(Icons.refresh),
+                      onPressed: () {
+                        widget.favouritesBloc
+                            .add(GetFavouritesEvent(uid: userId));
+                      },
+                    ),
+                  );
+                }
+                return Container();
               },
             )));
   }

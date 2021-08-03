@@ -1,8 +1,8 @@
 import 'package:cryptoapp/features/cryptoapp/domain/entities/items.dart';
 import 'package:cryptoapp/features/cryptoapp/presentation/bloc/auth/auth_bloc.dart';
 import 'package:cryptoapp/features/cryptoapp/presentation/bloc/items/items_bloc.dart';
-import 'package:cryptoapp/features/cryptoapp/presentation/bloc/navigationbar/navigationbar_bloc.dart';
 import 'package:cryptoapp/features/cryptoapp/presentation/widgets/crypto_item.dart';
+import 'package:cryptoapp/features/cryptoapp/presentation/widgets/show_snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -68,8 +68,9 @@ class _CryptoItemsPageState extends State<CryptoItemsPage>
                             child: IconButton(
                                 onPressed: () {
                                   textController.clear();
+                                  LoadedItems(items: _items);
                                   BlocProvider.of<ItemsBloc>(context)
-                                    ..add(RefreshItemsEvent());
+                                    ..add(CancelSearchEvent());
                                   Future.delayed(Duration.zero, () {
                                     FocusScope.of(context).unfocus();
                                   });
@@ -101,10 +102,16 @@ class _CryptoItemsPageState extends State<CryptoItemsPage>
           Expanded(
             child:
                 BlocConsumer<ItemsBloc, ItemsState>(listener: (context, state) {
-              print(state);
+              if (state is ErrorItems) {
+                ScaffoldMessenger.of(context)
+                    .showSnackBar(buildSnackBar(context, state.message));
+              }
+              if (state is Error) {
+                ScaffoldMessenger.of(context)
+                    .showSnackBar(buildSnackBar(context, state.message));
+              }
             }, builder: (context, state) {
-              if (state is LoadingItems && _items.isEmpty ||
-                  state is LoadingSearchResult) {
+              if (state is LoadingItems && _items.isEmpty || state is Loading) {
                 return Center(child: CircularProgressIndicator());
               } else if (state is LoadedItems) {
                 _items = state.items;
@@ -127,34 +134,16 @@ class _CryptoItemsPageState extends State<CryptoItemsPage>
                         itemCount: state.searchedItem.length),
                   ),
                 );
-              } else if (state is ErrorItems) {
-                return Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text('error_load'.tr()),
-                    IconButton(
-                      icon: Icon(Icons.refresh),
-                      onPressed: () {
-                        BlocProvider.of<ItemsBloc>(context)
-                          ..add(GetItemsEvent());
-                      },
-                    )
-                  ],
-                );
               } else if (state is ErrorItems && _items.isEmpty) {
-                return Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text('error_load'.tr()),
-                    IconButton(
-                      icon: Icon(Icons.refresh),
-                      onPressed: () {
-                        BlocProvider.of<ItemsBloc>(context)
-                          ..add(GetItemsEvent());
-                      },
-                    )
-                  ],
+                return IconButton(
+                  icon: Icon(Icons.refresh),
+                  onPressed: () {
+                    BlocProvider.of<ItemsBloc>(context)..add(GetItemsEvent());
+                  },
                 );
+              } else if (state is SearchError) {
+                return Center(
+                    child: Text(state.message, style: TextStyle(fontSize: 20)));
               }
               return RefreshIndicator(
                 onRefresh: () async {

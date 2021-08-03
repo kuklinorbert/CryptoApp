@@ -18,3 +18,5 @@ class VerifyFailure extends Failure {}
 class NetworkFailure extends Failure {}
 
 class ServerFailure extends Failure {}
+
+class SearchFailure extends Failure {}

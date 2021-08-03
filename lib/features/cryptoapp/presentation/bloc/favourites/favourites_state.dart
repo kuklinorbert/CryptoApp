@@ -31,3 +31,12 @@ class ErrorFavouritesState extends FavouritesState {
   @override
   List<Object> get props => [message];
 }
+
+class ErrorModifyingFavouritesState extends FavouritesState {
+  final String message;
+
+  ErrorModifyingFavouritesState({@required this.message});
+
+  @override
+  List<Object> get props => [message];
+}

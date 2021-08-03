@@ -15,6 +15,7 @@ import 'package:equatable/equatable.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 part 'auth_event.dart';
 part 'auth_state.dart';
@@ -193,17 +194,17 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   String _mapFailureToMessage(Failure failure) {
     switch (failure.runtimeType) {
       case NetworkFailure:
-        return 'network_fail';
+        return 'error_network'.tr();
       case CheckAuthFailure:
-        return 'checkauth_fail'; //.tr();
+        return 'checkauth_fail'.tr();
       case CodeSendFailure:
-        return 'codesend_fail'; //.tr();
+        return 'codesend_fail'.tr();
       case LogoutFailure:
-        return 'logout_fail'; //.tr();
+        return 'logout_fail'.tr();
       case VerifyFailure:
-        return 'verify_fail';
+        return 'verify_fail'.tr();
       default:
-        return 'unexp_error'; //.tr();
+        return 'error_unexp'.tr();
     }
   }
 }

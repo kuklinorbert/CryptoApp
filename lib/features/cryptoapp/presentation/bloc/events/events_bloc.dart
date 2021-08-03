@@ -8,6 +8,7 @@ import 'package:cryptoapp/features/cryptoapp/domain/usecases/get_events.dart';
 import 'package:dartz/dartz.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 part 'events_event.dart';
 part 'events_state.dart';
@@ -42,8 +43,12 @@ class EventsBloc extends Bloc<EventsEvent, EventsState> {
 
   String _mapFailureToMessage(Failure failure) {
     switch (failure.runtimeType) {
+      case NetworkFailure:
+        return "error_network".tr();
+      case ServerFailure:
+        return "error_server".tr();
       default:
-        return 'Unexpected error';
+        return 'error_unexp'.tr();
     }
   }
 }

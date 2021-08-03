@@ -101,11 +101,11 @@ Future<void> init() async {
   sl.registerLazySingleton<ItemsRepository>(
       () => ItemsRepositoryImpl(networkInfo: sl(), itemsDataSource: sl()));
 
-  sl.registerLazySingleton<FavouritesRepository>(
-      () => FavouritesRepositoryImpl(favouritesDataSource: sl()));
+  sl.registerLazySingleton<FavouritesRepository>(() =>
+      FavouritesRepositoryImpl(favouritesDataSource: sl(), networkInfo: sl()));
 
   sl.registerLazySingleton<ChartRepository>(
-      () => ChartRepositoryImpl(chartDataSource: sl()));
+      () => ChartRepositoryImpl(chartDataSource: sl(), networkInfo: sl()));
 
   sl.registerLazySingleton<ConverterRepository>(
       () => ConverterRepositoryImpl(networkInfo: sl(), itemsDataSource: sl()));

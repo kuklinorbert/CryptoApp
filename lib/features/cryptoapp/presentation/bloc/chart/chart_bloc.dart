@@ -7,6 +7,7 @@ import 'package:cryptoapp/features/cryptoapp/domain/usecases/get_chart.dart';
 import 'package:dartz/dartz.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 part 'chart_event.dart';
 part 'chart_state.dart';
@@ -24,7 +25,7 @@ class ChartBloc extends Bloc<ChartEvent, ChartState> {
     ChartEvent event,
   ) async* {
     if (event is GetChartEvent) {
-      yield ChartLoadingState();
+      // yield ChartLoadingState();
       final failureOrChart = await _getChart.call(Params(
           itemId: event.itemId,
           interval: event.interval,
@@ -44,7 +45,11 @@ class ChartBloc extends Bloc<ChartEvent, ChartState> {
 
 String _mapFailureToMessage(Failure failure) {
   switch (failure.runtimeType) {
+    case NetworkFailure:
+      return "error_network".tr();
+    case ServerFailure:
+      return "error_server".tr();
     default:
-      return 'Unexpected error';
+      return 'error_unexp'.tr();
   }
 }

@@ -24,7 +24,7 @@ class ItemsRepositoryImpl implements ItemsRepository {
         return Left(ServerFailure());
       }
     } else {
-      return Left(ServerFailure());
+      return Left(NetworkFailure());
     }
   }
 
@@ -37,13 +37,13 @@ class ItemsRepositoryImpl implements ItemsRepository {
         if (result.isNotEmpty) {
           return Right(result);
         } else {
-          return Left(ServerFailure());
+          return Left(SearchFailure());
         }
       } on ServerException {
         return Left(ServerFailure());
       }
     } else {
-      return Left(ServerFailure());
+      return Left(NetworkFailure());
     }
   }
 
@@ -57,7 +57,7 @@ class ItemsRepositoryImpl implements ItemsRepository {
         return Left(ServerFailure());
       }
     } else {
-      return Left(ServerFailure());
+      return Left(NetworkFailure());
     }
   }
 }

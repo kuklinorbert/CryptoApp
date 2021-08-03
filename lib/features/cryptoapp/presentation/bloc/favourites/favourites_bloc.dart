@@ -16,6 +16,7 @@ import 'package:dartz/dartz.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 part 'favourites_event.dart';
 part 'favourites_state.dart';
@@ -98,7 +99,8 @@ class FavouritesBloc extends Bloc<FavouritesEvent, FavouritesState> {
     Either<Failure, Response> failureOrAdd,
   ) async* {
     yield failureOrAdd.fold(
-      (failure) => ErrorFavouritesState(message: _mapFailureToMessage(failure)),
+      (failure) =>
+          ErrorModifyingFavouritesState(message: _mapFailureToMessage(failure)),
       (response) => YesFavouriteState(),
     );
   }
@@ -107,15 +109,20 @@ class FavouritesBloc extends Bloc<FavouritesEvent, FavouritesState> {
     Either<Failure, Response> failureOrRemove,
   ) async* {
     yield failureOrRemove.fold(
-      (failure) => ErrorFavouritesState(message: _mapFailureToMessage(failure)),
+      (failure) =>
+          ErrorModifyingFavouritesState(message: _mapFailureToMessage(failure)),
       (response) => NotFavouriteState(),
     );
   }
 
   String _mapFailureToMessage(Failure failure) {
     switch (failure.runtimeType) {
+      case NetworkFailure:
+        return "error_network".tr();
+      case ServerFailure:
+        return "error_server".tr();
       default:
-        return 'Unexpected error';
+        return 'error_unexp'.tr();
     }
   }
 }

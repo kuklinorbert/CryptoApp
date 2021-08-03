@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'package:cryptoapp/features/cryptoapp/domain/entities/items_interval.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';

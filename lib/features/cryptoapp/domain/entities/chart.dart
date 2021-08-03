@@ -13,6 +13,5 @@ class Chart extends Equatable {
   final List<String> prices;
 
   @override
-  // TODO: implement props
   List<Object> get props => [currency, timestamps, prices];
 }

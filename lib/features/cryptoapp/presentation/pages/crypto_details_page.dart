@@ -4,6 +4,7 @@ import 'package:cryptoapp/features/cryptoapp/presentation/bloc/chart/chart_bloc.
 import 'package:cryptoapp/features/cryptoapp/presentation/bloc/converter/converter_bloc.dart';
 import 'package:cryptoapp/features/cryptoapp/presentation/bloc/favourites/favourites_bloc.dart';
 import 'package:cryptoapp/features/cryptoapp/presentation/bloc/interval/interval_bloc.dart';
+import 'package:cryptoapp/features/cryptoapp/presentation/widgets/show_snackbar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/cupertino.dart';
@@ -30,58 +31,79 @@ class CryptoDetailsPage extends StatelessWidget {
         appBar: AppBar(
           title: Text(item.name),
           actions: [
-            BlocBuilder<FavouritesBloc, FavouritesState>(
-                bloc: favouritesBloc
-                  ..add(CheckFavouriteEvent(
-                      uid: FirebaseAuth.instance.currentUser.uid,
-                      itemId: item.id)),
-                buildWhen: (previous, current) {
-                  if (current is LoadingFavouritesState ||
-                      current is FavouritesFetchedState) {
-                    return false;
-                  } else {
-                    return true;
-                  }
-                },
-                builder: (context, state) {
-                  if (state is NotFavouriteState ||
-                      state is ErrorFavouritesState) {
-                    return IconButton(
-                        onPressed: () {
-                          favouritesBloc.add(AddFavouriteEvent(
-                              itemId: item.id,
-                              uid: FirebaseAuth.instance.currentUser.uid));
-                        },
-                        icon: Icon(Icons.favorite_outline));
-                  }
-                  if (state is YesFavouriteState) {
-                    return IconButton(
-                        onPressed: () {
-                          favouritesBloc.add(RemoveFavouriteEvent(
-                              itemId: item.id,
-                              uid: FirebaseAuth.instance.currentUser.uid));
-                        },
-                        icon: Icon(Icons.favorite));
-                  }
-                  return Container();
-                })
+            BlocListener<FavouritesBloc, FavouritesState>(
+              bloc: favouritesBloc,
+              listener: (context, state) {
+                if (state is ErrorModifyingFavouritesState) {
+                  ScaffoldMessenger.of(context)
+                      .showSnackBar(buildSnackBar(context, state.message));
+                }
+              },
+              child: BlocBuilder<FavouritesBloc, FavouritesState>(
+                  bloc: favouritesBloc
+                    ..add(CheckFavouriteEvent(
+                        uid: FirebaseAuth.instance.currentUser.uid,
+                        itemId: item.id)),
+                  buildWhen: (previous, current) {
+                    if (current is LoadingFavouritesState ||
+                        current is FavouritesFetchedState ||
+                        current is ErrorModifyingFavouritesState) {
+                      return false;
+                    } else {
+                      return true;
+                    }
+                  },
+                  builder: (context, state) {
+                    if (state is NotFavouriteState ||
+                        state is ErrorFavouritesState) {
+                      return IconButton(
+                          onPressed: () {
+                            favouritesBloc.add(AddFavouriteEvent(
+                                itemId: item.id,
+                                uid: FirebaseAuth.instance.currentUser.uid));
+                          },
+                          icon: Icon(Icons.favorite_outline));
+                    }
+                    if (state is YesFavouriteState) {
+                      return IconButton(
+                          onPressed: () {
+                            favouritesBloc.add(RemoveFavouriteEvent(
+                                itemId: item.id,
+                                uid: FirebaseAuth.instance.currentUser.uid));
+                          },
+                          icon: Icon(Icons.favorite));
+                    }
+                    return Container();
+                  }),
+            )
           ],
         ),
         body: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.all(12.0),
-            child: BlocBuilder<ConverterBloc, ConverterState>(
-              bloc: converterBloc..add(SwitchToUsdEvent()),
-              builder: (context, state) {
-                if (state is ConverterUSDState) {
-                  return buildBody(item, context, converterBloc, false, "\$");
+            child: BlocListener<ConverterBloc, ConverterState>(
+              bloc: converterBloc,
+              listener: (context, state) {
+                if (state is ConverterErrorState) {
+                  converterBloc.add(SwitchToUsdEvent());
+                  ScaffoldMessenger.of(context)
+                      .showSnackBar(buildSnackBar(context, state.message));
                 }
-                if (state is ConverterEURState) {
-                  return buildBody(
-                      state.item, context, converterBloc, true, "€");
-                }
-                return Container();
               },
+              child: BlocBuilder<ConverterBloc, ConverterState>(
+                bloc: converterBloc..add(SwitchToUsdEvent()),
+                builder: (context, state) {
+                  print(state);
+                  if (state is ConverterUSDState) {
+                    return buildBody(item, context, converterBloc, false, "\$");
+                  }
+                  if (state is ConverterEURState) {
+                    return buildBody(
+                        state.item, context, converterBloc, true, "€");
+                  }
+                  return Container();
+                },
+              ),
             ),
           ),
         ));
@@ -96,6 +118,8 @@ Column buildBody(Items item, BuildContext context, ConverterBloc converterBloc,
   DateTime today = new DateTime.now();
   TextStyle defaultStyle = TextStyle(fontSize: 16);
   ItemsInterval interval;
+
+  print(MediaQuery.of(context).orientation);
 
   return Column(
     mainAxisAlignment: MainAxisAlignment.start,
@@ -121,8 +145,14 @@ Column buildBody(Items item, BuildContext context, ConverterBloc converterBloc,
           Padding(
             padding: const EdgeInsets.only(right: 8.0, top: 2.0),
             child: SizedBox(
-              width: MediaQuery.of(context).size.height * 0.10,
-              height: MediaQuery.of(context).size.height * 0.10,
+              width:
+                  (MediaQuery.of(context).orientation == Orientation.portrait)
+                      ? MediaQuery.of(context).size.height * 0.10
+                      : MediaQuery.of(context).size.height * 0.20,
+              height:
+                  (MediaQuery.of(context).orientation == Orientation.portrait)
+                      ? MediaQuery.of(context).size.height * 0.10
+                      : MediaQuery.of(context).size.height * 0.20,
               child: (format == 'svg')
                   ? SvgPicture.network(
                       item.logoUrl,
@@ -345,106 +375,126 @@ Column buildInterval(
       ],
     ),
     Divider(),
-    BlocBuilder<ChartBloc, ChartState>(
-        bloc: chartBloc
-          ..add(GetChartEvent(
-              itemId: item.id,
-              interval: chartInterval.toUtc().toIso8601String(),
-              convert: convert)),
-        buildWhen: (previous, current) {
-          if (previous is ChartLoadedState) {
-            return false;
-          } else {
-            return true;
-          }
-        },
-        builder: (context, state) {
-          if (state is ChartLoadingState) {
-            return Center(
-              child: CircularProgressIndicator(),
-            );
-          } else if (state is ChartLoadedState) {
-            if (data.isNotEmpty) {
-              data = [];
-            }
-            int index = 0;
-            double min = double.parse(state.chart[0].prices[0]);
-            double max = double.parse(state.chart[0].prices[0]);
-
-            for (var priceData in state.chart[0].prices) {
-              data.add(FlSpot(index.toDouble(), double.parse(priceData)));
-              if (double.parse(priceData) < min) {
-                min = double.parse(priceData);
+    BlocListener<ChartBloc, ChartState>(
+      bloc: chartBloc,
+      listener: (context, state) {
+        if (state is ChartErrorState) {
+          ScaffoldMessenger.of(context)
+              .showSnackBar(buildSnackBar(context, state.message));
+        }
+      },
+      child: BlocBuilder<ChartBloc, ChartState>(
+          bloc: chartBloc
+            ..add(GetChartEvent(
+                itemId: item.id,
+                interval: chartInterval.toUtc().toIso8601String(),
+                convert: convert)),
+          // buildWhen: (previous, current) {
+          //   if (previous is ChartLoadedState) {
+          //     return false;
+          //   } else {
+          //     return true;
+          //   }
+          // },
+          builder: (context, state) {
+            if (state is ChartLoadingState) {
+              return Center(
+                child: CircularProgressIndicator(),
+              );
+            } else if (state is ChartLoadedState) {
+              if (data.isNotEmpty) {
+                data = [];
               }
-              if (double.parse(priceData) > max) {
-                max = double.parse(priceData);
-              }
-              index++;
-            }
+              int index = 0;
+              double min = double.parse(state.chart[0].prices[0]);
+              double max = double.parse(state.chart[0].prices[0]);
 
-            return Padding(
-              padding: const EdgeInsets.only(
-                  top: 20, left: 20, right: 20, bottom: 10),
-              child: SizedBox(
-                width: MediaQuery.of(context).size.width,
-                height: MediaQuery.of(context).size.height * 0.4,
-                child: LineChart(
-                  LineChartData(
-                    minY: min * 0.99,
-                    maxY: max * 1.01,
-                    lineTouchData: LineTouchData(
-                        getTouchLineStart: (data, index) {
-                          return 0;
-                        },
-                        getTouchLineEnd: (data, index) {
-                          return double.infinity;
-                        },
-                        touchTooltipData: LineTouchTooltipData(
-                            tooltipBgColor: Color.fromRGBO(255, 204, 0, 1),
-                            fitInsideHorizontally: true,
-                            getTooltipItems:
-                                (List<LineBarSpot> touchedBarSpots) {
-                              return touchedBarSpots.map((barSpot) {
-                                final flSpot = barSpot;
-                                return LineTooltipItem(
-                                    (days == 1)
-                                        ? state.chart[0]
-                                                .timestamps[flSpot.x.toInt()]
-                                                .toString()
-                                                .substring(11, 16) +
-                                            "\n"
-                                        : state.chart[0]
-                                                .timestamps[flSpot.x.toInt()]
-                                                .toString()
-                                                .substring(0, 10)
-                                                .replaceAll("-", ".") +
-                                            "\n",
-                                    TextStyle(
-                                        fontSize: 15,
-                                        color: Color.fromRGBO(0, 0, 132, 1)),
-                                    children: [
-                                      TextSpan(
-                                          text: flSpot.y.toStringAsFixed(3) +
-                                              currency)
-                                    ]);
-                              }).toList();
-                            })),
-                    titlesData: FlTitlesData(show: false),
-                    lineBarsData: [
-                      LineChartBarData(
-                          spots: data,
-                          barWidth: 3,
-                          dotData: FlDotData(show: false)),
-                    ],
-                    borderData: FlBorderData(show: false),
-                    gridData: FlGridData(show: false),
+              for (var priceData in state.chart[0].prices) {
+                data.add(FlSpot(index.toDouble(), double.parse(priceData)));
+                if (double.parse(priceData) < min) {
+                  min = double.parse(priceData);
+                }
+                if (double.parse(priceData) > max) {
+                  max = double.parse(priceData);
+                }
+                index++;
+              }
+
+              return Padding(
+                padding: const EdgeInsets.only(
+                    top: 20, left: 20, right: 20, bottom: 10),
+                child: SizedBox(
+                  width: MediaQuery.of(context).size.width,
+                  height: MediaQuery.of(context).size.height * 0.4,
+                  child: LineChart(
+                    LineChartData(
+                      minY: min * 0.99,
+                      maxY: max * 1.01,
+                      lineTouchData: LineTouchData(
+                          getTouchLineStart: (data, index) {
+                            return 0;
+                          },
+                          getTouchLineEnd: (data, index) {
+                            return double.infinity;
+                          },
+                          touchTooltipData: LineTouchTooltipData(
+                              tooltipBgColor: Color.fromRGBO(255, 204, 0, 1),
+                              fitInsideHorizontally: true,
+                              getTooltipItems:
+                                  (List<LineBarSpot> touchedBarSpots) {
+                                return touchedBarSpots.map((barSpot) {
+                                  final flSpot = barSpot;
+                                  return LineTooltipItem(
+                                      (days == 1)
+                                          ? state.chart[0]
+                                                  .timestamps[flSpot.x.toInt()]
+                                                  .toString()
+                                                  .substring(11, 16) +
+                                              "\n"
+                                          : state.chart[0]
+                                                  .timestamps[flSpot.x.toInt()]
+                                                  .toString()
+                                                  .substring(0, 10)
+                                                  .replaceAll("-", ".") +
+                                              "\n",
+                                      TextStyle(
+                                          fontSize: 15,
+                                          color: Color.fromRGBO(0, 0, 132, 1)),
+                                      children: [
+                                        TextSpan(
+                                            text: flSpot.y.toStringAsFixed(3) +
+                                                currency)
+                                      ]);
+                                }).toList();
+                              })),
+                      titlesData: FlTitlesData(show: false),
+                      lineBarsData: [
+                        LineChartBarData(
+                            spots: data,
+                            barWidth: 3,
+                            dotData: FlDotData(show: false)),
+                      ],
+                      borderData: FlBorderData(show: false),
+                      gridData: FlGridData(show: false),
+                    ),
                   ),
                 ),
-              ),
-            );
-          }
-          return Container();
-        }),
+              );
+            } else if (state is ChartErrorState) {
+              return Center(
+                child: IconButton(
+                    icon: Icon(Icons.refresh),
+                    onPressed: () {
+                      chartBloc.add(GetChartEvent(
+                          itemId: item.id,
+                          interval: chartInterval.toUtc().toIso8601String(),
+                          convert: convert));
+                    }),
+              );
+            }
+            return Container();
+          }),
+    ),
     Divider(),
     SizedBox(
       height: 15,

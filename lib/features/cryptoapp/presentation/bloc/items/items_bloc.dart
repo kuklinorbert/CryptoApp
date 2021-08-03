@@ -12,6 +12,7 @@ import 'package:dartz/dartz.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 part 'items_event.dart';
 part 'items_state.dart';
@@ -45,7 +46,7 @@ class ItemsBloc extends Bloc<ItemsEvent, ItemsState> {
       yield* _eitherLoadedOrErrorState(failureOrItems);
     }
     if (event is GetSearchedItemEvent) {
-      yield LoadingSearchResult();
+      yield Loading();
       lastSearch = event.searchText;
       final failureOrSearchResult = await _getSearchResult
           .call(search.Params(searchText: event.searchText));
@@ -55,13 +56,13 @@ class ItemsBloc extends Bloc<ItemsEvent, ItemsState> {
       yield LoadedItems(items: itemList);
     }
     if (event is RefreshSearchEvent) {
-      yield LoadingSearchResult();
+      yield Loading();
       final failureOrSearchResult =
           await _getSearchResult.call(search.Params(searchText: lastSearch));
       yield* _eitherSearchResultOrErrorState(failureOrSearchResult);
     }
     if (event is RefreshItemsEvent) {
-      yield LoadingSearchResult();
+      yield Loading();
       final failureOrItems =
           await _refreshItems.call(refresh.Params(page: page));
       yield* _eitherRefreshOrErrorState(failureOrItems);
@@ -72,7 +73,7 @@ class ItemsBloc extends Bloc<ItemsEvent, ItemsState> {
     Either<Failure, List<Items>> failureOrItem,
   ) async* {
     yield failureOrItem.fold(
-      (failure) => ErrorItems(message: _mapFailureToMessage(failure)),
+      (failure) => Error(message: _mapFailureToMessage(failure)),
       (items) {
         itemList = items;
         return LoadedItems(items: itemList);
@@ -84,7 +85,7 @@ class ItemsBloc extends Bloc<ItemsEvent, ItemsState> {
     Either<Failure, List<Items>> failureOrItem,
   ) async* {
     yield failureOrItem.fold(
-      (failure) => ErrorItems(message: _mapFailureToMessage(failure)),
+      (failure) => SearchError(message: _mapFailureToMessage(failure)),
       (item) {
         return LoadedSearchItem(searchedItem: item);
       },
@@ -106,8 +107,14 @@ class ItemsBloc extends Bloc<ItemsEvent, ItemsState> {
 
   String _mapFailureToMessage(Failure failure) {
     switch (failure.runtimeType) {
+      case NetworkFailure:
+        return "error_network".tr();
+      case ServerFailure:
+        return "error_server".tr();
+      case SearchFailure:
+        return "error_search".tr();
       default:
-        return 'Unexpected error';
+        return 'error_unexp'.tr();
     }
   }
 }

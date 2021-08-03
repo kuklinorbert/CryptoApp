@@ -24,7 +24,7 @@ class EventsRepositoryImpl implements EventsRepository {
         return Left(ServerFailure());
       }
     } else {
-      return Left(ServerFailure());
+      return Left(NetworkFailure());
     }
   }
 }

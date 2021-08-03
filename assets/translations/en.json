@@ -45,6 +45,16 @@
     "inactive": "inactive",
     "dead": "dead",
 
-    "error_load": "Error loading items"
+    "error_load": "Error loading items!",
+    "error_network": "No internet connection!",
+      "error_server": "Server error!",
+      "error_unexp": "Unexpected error!",
+      "error_search": "No items found!",
+
+      "checkauth_fail": "Authentication check failure",
+      "codesend_fail": "Code send failed!",
+      "logout_fail": "Logout failed",
+      "verify_fail" : "Verification failure"
+
 
 }

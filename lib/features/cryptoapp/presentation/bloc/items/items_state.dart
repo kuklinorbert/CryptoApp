@@ -20,6 +20,15 @@ class LoadedItems extends ItemsState {
   List<Object> get props => [items];
 }
 
+class Error extends ItemsState {
+  final String message;
+
+  Error({@required this.message});
+
+  @override
+  List<Object> get props => [message];
+}
+
 class ErrorItems extends ItemsState {
   final String message;
 
@@ -29,7 +38,16 @@ class ErrorItems extends ItemsState {
   List<Object> get props => [message];
 }
 
-class LoadingSearchResult extends ItemsState {}
+class SearchError extends ItemsState {
+  final String message;
+
+  SearchError({@required this.message});
+
+  @override
+  List<Object> get props => [message];
+}
+
+class Loading extends ItemsState {}
 
 class LoadedSearchItem extends ItemsState {
   final List<Items> searchedItem;
@@ -39,3 +57,5 @@ class LoadedSearchItem extends ItemsState {
   @override
   List<Object> get props => [searchedItem];
 }
+
+class NoItemFound extends ItemsState {}

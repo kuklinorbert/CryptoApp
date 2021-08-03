@@ -1,6 +1,5 @@
 import 'package:cryptoapp/core/error/failures.dart';
 import 'package:cryptoapp/core/usecases/usecase.dart';
-import 'package:cryptoapp/features/cryptoapp/domain/entities/favourites.dart';
 import 'package:cryptoapp/features/cryptoapp/domain/entities/items.dart';
 import 'package:cryptoapp/features/cryptoapp/domain/repositories/favourites_repository.dart';
 import 'package:dartz/dartz.dart';

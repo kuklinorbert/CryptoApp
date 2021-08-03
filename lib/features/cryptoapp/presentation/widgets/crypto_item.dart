@@ -17,7 +17,9 @@ class CryptoItem extends StatelessWidget {
           Navigator.of(context).pushNamed('/cryptodetails', arguments: item);
         },
         child: SizedBox(
-          height: MediaQuery.of(context).size.height * 0.15,
+          height: MediaQuery.of(context).orientation == Orientation.portrait
+              ? MediaQuery.of(context).size.height * 0.15
+              : MediaQuery.of(context).size.height * 0.20,
           width: MediaQuery.of(context).size.width,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.start,
@@ -28,8 +30,14 @@ class CryptoItem extends StatelessWidget {
                   left: 15.0,
                 ),
                 child: Container(
-                  width: MediaQuery.of(context).size.height * 0.10,
-                  height: MediaQuery.of(context).size.height * 0.10,
+                  width:
+                      MediaQuery.of(context).orientation == Orientation.portrait
+                          ? MediaQuery.of(context).size.height * 0.10
+                          : MediaQuery.of(context).size.height * 0.15,
+                  height:
+                      MediaQuery.of(context).orientation == Orientation.portrait
+                          ? MediaQuery.of(context).size.height * 0.10
+                          : MediaQuery.of(context).size.height * 0.15,
                   child: (format == 'svg')
                       ? SvgPicture.network(
                           item.logoUrl,

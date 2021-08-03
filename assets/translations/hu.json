@@ -45,6 +45,16 @@
     "inactive": "inaktív",
     "dead": "halott",
 
-    "error_load": "Hiba a betöltés közben"
+    "error_load": "Hiba a betöltés közben!",
+    "error_network": "Nincs internet kapcsolat!",
+      "error_server": "Szerver hiba!",
+      "error_unexp": "Váratlan hiba történt!",
+    "error_search": "Nincs találat!",
+
+      "checkauth_fail": "Sikertelen authentikáció!",
+      "codesend_fail": "Nem sikerült elküldeni a kódot!",
+      "logout_fail": "Nem sikerült kijelentkezni!",
+      "verify_fail" : "Sikertelen verifikáció!"
+
 
 }

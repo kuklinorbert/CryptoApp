@@ -7,6 +7,7 @@ import 'package:cryptoapp/features/cryptoapp/domain/usecases/get_converted_item.
 import 'package:dartz/dartz.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 part 'converter_event.dart';
 part 'converter_state.dart';
@@ -44,8 +45,12 @@ class ConverterBloc extends Bloc<ConverterEvent, ConverterState> {
 
   String _mapFailureToMessage(Failure failure) {
     switch (failure.runtimeType) {
+      case NetworkFailure:
+        return "error_network".tr();
+      case ServerFailure:
+        return "error_server".tr();
       default:
-        return 'Unexpected error';
+        return 'error_unexp'.tr();
     }
   }
 }
