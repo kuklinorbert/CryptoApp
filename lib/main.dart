@@ -49,7 +49,7 @@ class MyApp extends StatelessWidget {
             locale: context.locale,
             supportedLocales: context.supportedLocales,
             localizationsDelegates: context.localizationDelegates,
-            home: initScreen == 0 ? OnboardingPage() : AuthPage(),
+            home: initScreen == 1 ? AuthPage() : OnboardingPage(),
             routes: {
               '/auth': (context) => AuthPage(),
               '/main': (context) => MainPage(),

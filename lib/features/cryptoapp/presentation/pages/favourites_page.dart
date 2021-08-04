@@ -38,11 +38,20 @@ class _FavouritesPage1State extends State<FavouritesPage>
         },
         child: BlocListener<FavouritesBloc, FavouritesState>(
             bloc: widget.favouritesBloc,
-            listener: (context, state) {
-              if (state is YesFavouriteState) {
-                widget.favouritesBloc.add(GetFavouritesEvent(uid: userId));
+            listenWhen: (previous, current) {
+              if (previous is SwitchingFavouriteState &&
+                      current is NotFavouriteState ||
+                  previous is SwitchingFavouriteState &&
+                      current is YesFavouriteState) {
+                return true;
+              } else {
+                return false;
               }
-              if (state is NotFavouriteState) {
+            },
+            listener: (context, state) {
+              print("favourites listener: " + state.toString());
+
+              if (state is YesFavouriteState || state is NotFavouriteState) {
                 widget.favouritesBloc.add(GetFavouritesEvent(uid: userId));
               }
               if (state is ErrorFavouritesState) {
@@ -52,7 +61,17 @@ class _FavouritesPage1State extends State<FavouritesPage>
             },
             child: BlocBuilder<FavouritesBloc, FavouritesState>(
               bloc: widget.favouritesBloc..add(GetFavouritesEvent(uid: userId)),
+              buildWhen: (previous, current) {
+                if (current is YesFavouriteState ||
+                    current is CheckingFavouriteState ||
+                    current is NotFavouriteState) {
+                  return false;
+                } else {
+                  return true;
+                }
+              },
               builder: (context, state) {
+                print("favourites builder: " + state.toString());
                 if (state is LoadingFavouritesState) {
                   return Center(
                     child: CircularProgressIndicator(),

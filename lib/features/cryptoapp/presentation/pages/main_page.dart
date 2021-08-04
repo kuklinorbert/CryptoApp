@@ -128,6 +128,7 @@ class _MainPageState extends State<MainPage> {
               onPageChanged: (index) {
                 if (index == 0) navbarBloc.add(HomeSelected());
                 if (index == 1) navbarBloc.add(FavouritesSelected());
+
                 if (index == 2) navbarBloc.add(EventsSelected());
               },
               children: [
@@ -148,13 +149,22 @@ class _MainPageState extends State<MainPage> {
           bloc: navbarBloc,
           builder: (context, state) {
             if (state is NavigationbarHome || state is NavigationbarInitial) {
-              return buildNavBar(navbarBloc: navbarBloc, index: 0);
+              return buildNavBar(
+                  navbarBloc: navbarBloc,
+                  index: 0,
+                  favouritesBloc: favouritesBloc);
             }
             if (state is NavigationbarFavourites) {
-              return buildNavBar(navbarBloc: navbarBloc, index: 1);
+              return buildNavBar(
+                  navbarBloc: navbarBloc,
+                  index: 1,
+                  favouritesBloc: favouritesBloc);
             }
             if (state is NavigationbarEvents) {
-              return buildNavBar(navbarBloc: navbarBloc, index: 2);
+              return buildNavBar(
+                  navbarBloc: navbarBloc,
+                  index: 2,
+                  favouritesBloc: favouritesBloc);
             }
             return Container();
           },
@@ -167,10 +177,12 @@ class buildNavBar extends StatelessWidget {
     Key key,
     @required this.navbarBloc,
     @required this.index,
+    @required this.favouritesBloc,
   }) : super(key: key);
 
   final NavigationbarBloc navbarBloc;
   final int index;
+  final FavouritesBloc favouritesBloc;
 
   @override
   Widget build(BuildContext context) {

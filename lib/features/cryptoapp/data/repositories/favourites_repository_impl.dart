@@ -68,22 +68,23 @@ class FavouritesRepositoryImpl implements FavouritesRepository {
   @override
   Future<Either<Failure, bool>> checkFavourite(
       String uid, String itemId) async {
-    try {
-      if (savedFav.favourites.isEmpty) {
-        if (await networkInfo.isConnected) {
+    if (savedFav.favourites.isEmpty) {
+      if (await networkInfo.isConnected) {
+        print('hahoo');
+        try {
           final result = await favouritesDataSource.checkFavourites(uid);
           savedFav = result;
-        } else {
-          return Left(NetworkFailure());
+        } on ServerException {
+          return Left(ServerFailure());
         }
-      }
-      if (savedFav.favourites.contains(itemId)) {
-        return Right(true);
       } else {
-        return Right(false);
+        return Left(NetworkFailure());
       }
-    } on ServerException {
-      return Left(ServerFailure());
+    }
+    if (savedFav.favourites.contains(itemId)) {
+      return Right(true);
+    } else {
+      return Right(false);
     }
   }
 }

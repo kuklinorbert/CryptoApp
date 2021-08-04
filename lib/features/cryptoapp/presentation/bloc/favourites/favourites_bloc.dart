@@ -52,17 +52,19 @@ class FavouritesBloc extends Bloc<FavouritesEvent, FavouritesState> {
       yield* _eitherListOrErrorState(failureOrFavourites);
     }
     if (event is AddFavouriteEvent) {
+      yield SwitchingFavouriteState();
       final failureOrResponse = await _addFavourite
           .call(add.Params(uid: event.uid, itemId: event.itemId));
       yield* _eitherAddOrErrorState(failureOrResponse);
     }
     if (event is RemoveFavouriteEvent) {
+      yield SwitchingFavouriteState();
       final failureOrResponse = await _removeFavourite
           .call(remove.Params(uid: event.uid, itemId: event.itemId));
       yield* _eitherRemoveOrErrorState(failureOrResponse);
     }
     if (event is CheckFavouriteEvent) {
-      yield LoadingFavouritesState();
+      yield CheckingFavouriteState();
       final failureOrBool = await _checkFavourite
           .call(check.Params(uid: event.uid, itemId: event.itemId));
       yield* _eitherBoolOrErrorState(failureOrBool);

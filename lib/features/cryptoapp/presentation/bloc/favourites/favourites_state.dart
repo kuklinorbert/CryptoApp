@@ -23,6 +23,10 @@ class YesFavouriteState extends FavouritesState {}
 
 class NotFavouriteState extends FavouritesState {}
 
+class SwitchingFavouriteState extends FavouritesState {}
+
+class CheckingFavouriteState extends FavouritesState {}
+
 class ErrorFavouritesState extends FavouritesState {
   final String message;
 

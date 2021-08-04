@@ -57,7 +57,8 @@ class OnboardingPage extends StatelessWidget {
               SizedBox(
                 height: 10,
               ),
-              Text("favourite_long".tr(), style: defaultStyle2)
+              Text("favourite_long".tr(),
+                  textAlign: TextAlign.center, style: defaultStyle2)
             ]),
           ),
           bodyWidget: Padding(
@@ -85,7 +86,8 @@ class OnboardingPage extends StatelessWidget {
                 SizedBox(
                   height: 10,
                 ),
-                Text("events_long".tr(), style: defaultStyle2)
+                Text("events_long".tr(),
+                    textAlign: TextAlign.center, style: defaultStyle2)
               ]),
             ),
             bodyWidget: Padding(

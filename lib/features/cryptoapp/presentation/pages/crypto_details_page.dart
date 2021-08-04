@@ -47,13 +47,17 @@ class CryptoDetailsPage extends StatelessWidget {
                   buildWhen: (previous, current) {
                     if (current is LoadingFavouritesState ||
                         current is FavouritesFetchedState ||
-                        current is ErrorModifyingFavouritesState) {
+                        current is ErrorModifyingFavouritesState ||
+                        previous is FavouritesState &&
+                            current is ErrorFavouritesState ||
+                        current is SwitchingFavouriteState) {
                       return false;
                     } else {
                       return true;
                     }
                   },
                   builder: (context, state) {
+                    print("favourite details: " + state.toString());
                     if (state is NotFavouriteState ||
                         state is ErrorFavouritesState) {
                       return IconButton(
