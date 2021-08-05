@@ -10,7 +10,11 @@ class CryptoItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     String format;
-    format = item.logoUrl.substring(item.logoUrl.length - 3);
+    if (item.logoUrl.isNotEmpty) {
+      format = item.logoUrl.substring(item.logoUrl.length - 3);
+    } else {
+      format = "null";
+    }
     return Card(
       child: InkWell(
         onTap: () {
@@ -43,10 +47,12 @@ class CryptoItem extends StatelessWidget {
                           item.logoUrl,
                           fit: BoxFit.fill,
                         )
-                      : Image.network(
-                          item.logoUrl,
-                          fit: BoxFit.fill,
-                        ),
+                      : (format == 'null')
+                          ? Container()
+                          : Image.network(
+                              item.logoUrl,
+                              fit: BoxFit.fill,
+                            ),
                 ),
               ),
               SizedBox(width: 30),
