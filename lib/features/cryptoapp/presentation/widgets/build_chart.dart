@@ -1,5 +1,6 @@
 import 'package:cryptoapp/features/cryptoapp/domain/entities/items.dart';
 import 'package:cryptoapp/features/cryptoapp/presentation/bloc/chart/chart_bloc.dart';
+import 'package:cryptoapp/features/cryptoapp/presentation/widgets/formatters.dart';
 import 'package:cryptoapp/features/cryptoapp/presentation/widgets/show_snackbar.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
@@ -83,11 +84,10 @@ BlocListener<ChartBloc, ChartState> buildChart(
                                                   .toString()
                                                   .substring(11, 16) +
                                               "\n"
-                                          : state.chart[0]
-                                                  .timestamps[flSpot.x.toInt()]
-                                                  .toString()
-                                                  .substring(0, 10)
-                                                  .replaceAll("-", ".") +
+                                          : formatDate(
+                                                  state.chart[0].timestamps[
+                                                      flSpot.x.toInt()],
+                                                  context) +
                                               "\n",
                                       TextStyle(
                                           fontSize: 15,
@@ -113,19 +113,42 @@ BlocListener<ChartBloc, ChartState> buildChart(
                 ),
               );
             } else {
-              return Container();
+              return Padding(
+                padding: const EdgeInsets.only(
+                    top: 20, left: 20, right: 20, bottom: 10),
+                child: SizedBox(
+                  width: MediaQuery.of(context).size.width,
+                  height: MediaQuery.of(context).size.height * 0.4,
+                  child: Center(
+                    child: Text(
+                      'No data found!',
+                      style: TextStyle(fontSize: 18),
+                    ),
+                  ),
+                ),
+              );
             }
           } else if (state is ChartErrorState) {
-            return Center(
-              child: IconButton(
-                  icon: Icon(Icons.refresh),
-                  onPressed: () {
-                    chartBloc.add(GetChartEvent(
-                        itemId: item.id,
-                        interval: chartInterval.toUtc().toIso8601String(),
-                        convert: convert));
-                  }),
-            );
+            return Padding(
+                padding: const EdgeInsets.only(
+                    top: 20, left: 20, right: 20, bottom: 10),
+                child: SizedBox(
+                  width: MediaQuery.of(context).size.width,
+                  height: MediaQuery.of(context).size.height * 0.4,
+                  child: Center(
+                    child: IconButton(
+                        icon: Icon(
+                          Icons.refresh,
+                          size: 35,
+                        ),
+                        onPressed: () {
+                          chartBloc.add(GetChartEvent(
+                              itemId: item.id,
+                              interval: chartInterval.toUtc().toIso8601String(),
+                              convert: convert));
+                        }),
+                  ),
+                ));
           }
           return Container();
         }),

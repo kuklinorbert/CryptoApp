@@ -100,7 +100,10 @@ class _FavouritesPage1State extends State<FavouritesPage>
                 if (state is ErrorFavouritesState) {
                   return Center(
                     child: IconButton(
-                      icon: Icon(Icons.refresh),
+                      icon: Icon(
+                        Icons.refresh,
+                        size: 35,
+                      ),
                       onPressed: () {
                         widget.favouritesBloc
                             .add(GetFavouritesEvent(uid: userId));

@@ -1,8 +1,10 @@
 import 'package:cryptoapp/features/cryptoapp/presentation/bloc/auth/auth_bloc.dart';
 import 'package:cryptoapp/features/cryptoapp/presentation/bloc/events/events_bloc.dart';
+import 'package:cryptoapp/features/cryptoapp/presentation/widgets/formatters.dart';
 import 'package:cryptoapp/features/cryptoapp/presentation/widgets/show_snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
 
 import '../../../../injection_container.dart';
 
@@ -18,6 +20,8 @@ class EventsPage extends StatefulWidget {
 class _EventsPageState extends State<EventsPage>
     with AutomaticKeepAliveClientMixin {
   EventsBloc eventsBloc = sl<EventsBloc>();
+
+  DateFormat dateFormat = DateFormat('dd.MM.yyyy');
 
   @override
   bool get wantKeepAlive => true;
@@ -109,15 +113,14 @@ class _EventsPageState extends State<EventsPage>
                                             color: Colors.blue,
                                           ),
                                           Text(
-                                            state.event.data[i].startDate
-                                                .toString()
-                                                .substring(0, 10)
-                                                .replaceAll("-", "."),
+                                            formatDate(
+                                                state.event.data[i].startDate,
+                                                context),
                                             style: TextStyle(
                                                 fontSize: 15,
                                                 fontWeight: FontWeight.w500,
                                                 color: Colors.blue),
-                                          ),
+                                          )
                                         ]),
                                       )
                                     ],
@@ -129,7 +132,7 @@ class _EventsPageState extends State<EventsPage>
                 } else if (state is ErrorEvents) {
                   return Center(
                     child: IconButton(
-                        icon: Icon(Icons.refresh),
+                        icon: Icon(Icons.refresh, size: 35),
                         onPressed: () {
                           eventsBloc.add(GetEventsEvent());
                         }),

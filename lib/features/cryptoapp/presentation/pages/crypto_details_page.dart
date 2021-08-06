@@ -244,11 +244,7 @@ Column buildBody(Items item, BuildContext context, ConverterBloc converterBloc,
         style: defaultStyle,
       ),
       Text(
-        "date".tr() +
-            item.highTimestamp
-                .toIso8601String()
-                .substring(0, 10)
-                .replaceAll("-", "."),
+        "date".tr() + formatDate(item.highTimestamp, context),
         style: defaultStyle,
       ),
       SizedBox(height: 5),
@@ -268,28 +264,19 @@ Column buildBody(Items item, BuildContext context, ConverterBloc converterBloc,
           "first_trade".tr() +
               ((item.firstTrade == null)
                   ? " - "
-                  : item.firstTrade
-                      .toIso8601String()
-                      .substring(0, 10)
-                      .replaceAll("-", ".")),
+                  : formatDate(item.firstTrade, context)),
           style: defaultStyle),
       Text(
           "first_candle".tr() +
               ((item.firstCandle == null)
                   ? " - "
-                  : item.firstCandle
-                      .toIso8601String()
-                      .substring(0, 10)
-                      .replaceAll("-", ".")),
+                  : formatDate(item.firstCandle, context)),
           style: defaultStyle),
       Text(
           "first_order".tr() +
               ((item.firstOrderBook == null)
                   ? " - "
-                  : item.firstOrderBook
-                      .toIso8601String()
-                      .substring(0, 10)
-                      .replaceAll("-", ".")),
+                  : formatDate(item.firstOrderBook, context)),
           style: defaultStyle),
       SizedBox(height: 10),
     ],

@@ -90,7 +90,10 @@ class _CryptoItemsPageState extends State<CryptoItemsPage>
                 );
               } else if (state is ErrorItems && items.isEmpty) {
                 return IconButton(
-                  icon: Icon(Icons.refresh),
+                  icon: Icon(
+                    Icons.refresh,
+                    size: 35,
+                  ),
                   onPressed: () {
                     BlocProvider.of<ItemsBloc>(context)..add(GetItemsEvent());
                   },

@@ -38,3 +38,11 @@ String formatLongNumber(String number, BuildContext context) {
   var formatNum = double.parse(number);
   return formatLong.format(formatNum);
 }
+
+String formatDate(DateTime date, BuildContext context) {
+  DateFormat dateFormatEN = DateFormat('dd.MM.yyyy');
+  DateFormat dateFormatHU = DateFormat('yyyy.MM.dd');
+  return (Localizations.localeOf(context).languageCode == 'en')
+      ? dateFormatEN.format(date)
+      : dateFormatHU.format(date);
+}
