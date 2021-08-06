@@ -33,84 +33,88 @@ BlocListener<ChartBloc, ChartState> buildChart(
               child: CircularProgressIndicator(),
             );
           } else if (state is ChartLoadedState) {
-            if (data.isNotEmpty) {
-              data = [];
-            }
-            int index = 0;
-            double min = double.parse(state.chart[0].prices[0]);
-            double max = double.parse(state.chart[0].prices[0]);
-
-            for (var priceData in state.chart[0].prices) {
-              data.add(FlSpot(index.toDouble(), double.parse(priceData)));
-              if (double.parse(priceData) < min) {
-                min = double.parse(priceData);
+            if (state.chart.isNotEmpty) {
+              if (data.isNotEmpty) {
+                data = [];
               }
-              if (double.parse(priceData) > max) {
-                max = double.parse(priceData);
-              }
-              index++;
-            }
+              int index = 0;
+              double min = double.parse(state.chart[0].prices[0]);
+              double max = double.parse(state.chart[0].prices[0]);
 
-            return Padding(
-              padding: const EdgeInsets.only(
-                  top: 20, left: 20, right: 20, bottom: 10),
-              child: SizedBox(
-                width: MediaQuery.of(context).size.width,
-                height: MediaQuery.of(context).size.height * 0.4,
-                child: LineChart(
-                  LineChartData(
-                    minY: min * 0.99,
-                    maxY: max * 1.01,
-                    lineTouchData: LineTouchData(
-                        getTouchLineStart: (data, index) {
-                          return 0;
-                        },
-                        getTouchLineEnd: (data, index) {
-                          return double.infinity;
-                        },
-                        touchTooltipData: LineTouchTooltipData(
-                            tooltipBgColor: Color.fromRGBO(255, 204, 0, 1),
-                            fitInsideHorizontally: true,
-                            getTooltipItems:
-                                (List<LineBarSpot> touchedBarSpots) {
-                              return touchedBarSpots.map((barSpot) {
-                                final flSpot = barSpot;
-                                return LineTooltipItem(
-                                    (days == 1)
-                                        ? state.chart[0]
-                                                .timestamps[flSpot.x.toInt()]
-                                                .toString()
-                                                .substring(11, 16) +
-                                            "\n"
-                                        : state.chart[0]
-                                                .timestamps[flSpot.x.toInt()]
-                                                .toString()
-                                                .substring(0, 10)
-                                                .replaceAll("-", ".") +
-                                            "\n",
-                                    TextStyle(
-                                        fontSize: 15,
-                                        color: Color.fromRGBO(0, 0, 132, 1)),
-                                    children: [
-                                      TextSpan(
-                                          text: flSpot.y.toStringAsFixed(3) +
-                                              currency)
-                                    ]);
-                              }).toList();
-                            })),
-                    titlesData: FlTitlesData(show: false),
-                    lineBarsData: [
-                      LineChartBarData(
-                          spots: data,
-                          barWidth: 3,
-                          dotData: FlDotData(show: false)),
-                    ],
-                    borderData: FlBorderData(show: false),
-                    gridData: FlGridData(show: false),
+              for (var priceData in state.chart[0].prices) {
+                data.add(FlSpot(index.toDouble(), double.parse(priceData)));
+                if (double.parse(priceData) < min) {
+                  min = double.parse(priceData);
+                }
+                if (double.parse(priceData) > max) {
+                  max = double.parse(priceData);
+                }
+                index++;
+              }
+
+              return Padding(
+                padding: const EdgeInsets.only(
+                    top: 20, left: 20, right: 20, bottom: 10),
+                child: SizedBox(
+                  width: MediaQuery.of(context).size.width,
+                  height: MediaQuery.of(context).size.height * 0.4,
+                  child: LineChart(
+                    LineChartData(
+                      minY: min * 0.99,
+                      maxY: max * 1.01,
+                      lineTouchData: LineTouchData(
+                          getTouchLineStart: (data, index) {
+                            return 0;
+                          },
+                          getTouchLineEnd: (data, index) {
+                            return double.infinity;
+                          },
+                          touchTooltipData: LineTouchTooltipData(
+                              tooltipBgColor: Color.fromRGBO(255, 204, 0, 1),
+                              fitInsideHorizontally: true,
+                              getTooltipItems:
+                                  (List<LineBarSpot> touchedBarSpots) {
+                                return touchedBarSpots.map((barSpot) {
+                                  final flSpot = barSpot;
+                                  return LineTooltipItem(
+                                      (days == 1)
+                                          ? state.chart[0]
+                                                  .timestamps[flSpot.x.toInt()]
+                                                  .toString()
+                                                  .substring(11, 16) +
+                                              "\n"
+                                          : state.chart[0]
+                                                  .timestamps[flSpot.x.toInt()]
+                                                  .toString()
+                                                  .substring(0, 10)
+                                                  .replaceAll("-", ".") +
+                                              "\n",
+                                      TextStyle(
+                                          fontSize: 15,
+                                          color: Color.fromRGBO(0, 0, 132, 1)),
+                                      children: [
+                                        TextSpan(
+                                            text: flSpot.y.toStringAsFixed(3) +
+                                                currency)
+                                      ]);
+                                }).toList();
+                              })),
+                      titlesData: FlTitlesData(show: false),
+                      lineBarsData: [
+                        LineChartBarData(
+                            spots: data,
+                            barWidth: 3,
+                            dotData: FlDotData(show: false)),
+                      ],
+                      borderData: FlBorderData(show: false),
+                      gridData: FlGridData(show: false),
+                    ),
                   ),
                 ),
-              ),
-            );
+              );
+            } else {
+              return Container();
+            }
           } else if (state is ChartErrorState) {
             return Center(
               child: IconButton(

@@ -115,12 +115,20 @@ class CryptoDetailsPage extends StatelessWidget {
 
 Column buildBody(Items item, BuildContext context, ConverterBloc converterBloc,
     bool convert, String currency) {
-  String format = item.logoUrl.substring(item.logoUrl.length - 3);
+  String format;
+
+  print(item.firstOrderBook);
   ChartBloc chartBloc = sl<ChartBloc>();
   IntervalBloc intervalBloc = sl<IntervalBloc>();
   DateTime today = new DateTime.now();
   TextStyle defaultStyle = TextStyle(fontSize: 16);
   ItemsInterval interval;
+
+  if (item.logoUrl.isNotEmpty) {
+    format = item.logoUrl.substring(item.logoUrl.length - 3);
+  } else {
+    format = "null";
+  }
 
   return Column(
     mainAxisAlignment: MainAxisAlignment.start,
@@ -159,10 +167,12 @@ Column buildBody(Items item, BuildContext context, ConverterBloc converterBloc,
                       item.logoUrl,
                       fit: BoxFit.fill,
                     )
-                  : Image.network(
-                      item.logoUrl,
-                      fit: BoxFit.fill,
-                    ),
+                  : (format == 'null')
+                      ? Container()
+                      : Image.network(
+                          item.logoUrl,
+                          fit: BoxFit.fill,
+                        ),
             ),
           ),
         ],
@@ -209,14 +219,17 @@ Column buildBody(Items item, BuildContext context, ConverterBloc converterBloc,
         height: 15,
       ),
       Text(
-        "circ_supply".tr() + formatLongNumber(item.circulatingSupply),
+        "circ_supply".tr() +
+            ((item.circulatingSupply == null)
+                ? " - "
+                : formatLongNumber(item.circulatingSupply, context)),
         style: defaultStyle,
       ),
       SizedBox(
         height: 5,
       ),
       item.maxSupply != null
-          ? Text("max_supply".tr() + formatLongNumber(item.maxSupply),
+          ? Text("max_supply".tr() + formatLongNumber(item.maxSupply, context),
               style: defaultStyle)
           : Text("max_supply".tr() + " - ", style: defaultStyle),
       SizedBox(height: 5),
@@ -253,24 +266,30 @@ Column buildBody(Items item, BuildContext context, ConverterBloc converterBloc,
       ),
       Text(
           "first_trade".tr() +
-              item.firstTrade
-                  .toIso8601String()
-                  .substring(0, 10)
-                  .replaceAll("-", "."),
+              ((item.firstTrade == null)
+                  ? " - "
+                  : item.firstTrade
+                      .toIso8601String()
+                      .substring(0, 10)
+                      .replaceAll("-", ".")),
           style: defaultStyle),
       Text(
           "first_candle".tr() +
-              item.firstCandle
-                  .toIso8601String()
-                  .substring(0, 10)
-                  .replaceAll("-", "."),
+              ((item.firstCandle == null)
+                  ? " - "
+                  : item.firstCandle
+                      .toIso8601String()
+                      .substring(0, 10)
+                      .replaceAll("-", ".")),
           style: defaultStyle),
       Text(
           "first_order".tr() +
-              item.firstOrderBook
-                  .toIso8601String()
-                  .substring(0, 10)
-                  .replaceAll("-", "."),
+              ((item.firstOrderBook == null)
+                  ? " - "
+                  : item.firstOrderBook
+                      .toIso8601String()
+                      .substring(0, 10)
+                      .replaceAll("-", ".")),
           style: defaultStyle),
       SizedBox(height: 10),
     ],

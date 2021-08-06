@@ -25,6 +25,8 @@ Column buildInterval(
     String currency) {
   List<FlSpot> data = [];
   DateTime chartInterval;
+  TextStyle defaultTextStyle = TextStyle(fontSize: 16);
+
   (days == 0)
       ? chartInterval = DateTime(DateTime.now().year)
       : chartInterval = today.subtract(Duration(days: days));
@@ -32,16 +34,20 @@ Column buildInterval(
   return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
     Row(
       children: [
-        Text(formatNumber(interval.priceChange) + currency,
-            style: styleText(interval.priceChange)),
+        (interval == null || interval.priceChange == null)
+            ? Container()
+            : Text(formatNumber(interval.priceChange) + currency,
+                style: styleText(interval.priceChange)),
         SizedBox(width: 15),
-        Text(formatPercentage(interval.priceChangePct),
-            style: styleText(interval.priceChangePct)),
+        (interval == null || interval.priceChangePct == null)
+            ? Container()
+            : Text(formatPercentage(interval.priceChangePct),
+                style: styleText(interval.priceChangePct)),
         Spacer(),
         Padding(
           padding: const EdgeInsets.only(right: 8.0),
           child: Text(
-            "rank".tr() + item.rank,
+            "rank".tr() + ((item.rank == null) ? " - " : item.rank),
             textAlign: TextAlign.end,
             style: TextStyle(fontSize: 18),
           ),
@@ -66,7 +72,11 @@ Column buildInterval(
     SizedBox(
       height: 10,
     ),
-    Text("volume".tr() + currency + formatLongNumber(interval.volume),
+    Text(
+        "volume".tr() +
+            ((interval == null || interval.volume == null)
+                ? " - "
+                : currency + formatLongNumber(interval.volume, context)),
         style: TextStyle(fontSize: 20)),
     Row(
       children: [
@@ -74,21 +84,28 @@ Column buildInterval(
           "change".tr(),
           style: TextStyle(fontSize: 18),
         ),
-        Text(
-            currency +
-                formatLongNumber(
-                  interval.volumeChange,
-                ),
-            style: styleText(interval.volumeChange)),
+        (interval == null || interval.volumeChange == null)
+            ? Text(
+                " - ",
+                style: defaultTextStyle,
+              )
+            : Text(currency + formatLongNumber(interval.volumeChange, context),
+                style: styleText(interval.volumeChange)),
         SizedBox(width: 15),
-        Text(formatPercentage(interval.volumeChangePct),
-            style: styleText(interval.volumeChangePct))
+        (interval == null || interval.volumeChangePct == null)
+            ? Container()
+            : Text(formatPercentage(interval.volumeChangePct),
+                style: styleText(interval.volumeChangePct))
       ],
     ),
     SizedBox(
       height: 10,
     ),
-    Text("market_cap".tr() + currency + formatLongNumber(item.marketCap),
+    Text(
+        "market_cap".tr() +
+            ((item.marketCap == null)
+                ? " - "
+                : currency + formatLongNumber(item.marketCap, context)),
         style: TextStyle(fontSize: 20)),
     Row(
       children: [
@@ -96,13 +113,21 @@ Column buildInterval(
           "change".tr(),
           style: TextStyle(fontSize: 18),
         ),
-        Text(currency + formatLongNumber(interval.marketCapChange),
-            style: styleText(interval.marketCapChange)),
+        (interval == null || interval.marketCapChange == null)
+            ? Text(
+                " - ",
+                style: defaultTextStyle,
+              )
+            : Text(
+                currency + formatLongNumber(interval.marketCapChange, context),
+                style: styleText(interval.marketCapChange)),
         SizedBox(width: 15),
-        Text(
-          formatPercentage(interval.marketCapChangePct),
-          style: styleText(interval.marketCapChangePct),
-        )
+        (interval == null || interval.marketCapChangePct == null)
+            ? Container()
+            : Text(
+                formatPercentage(interval.marketCapChangePct),
+                style: styleText(interval.marketCapChangePct),
+              )
       ],
     ),
     SizedBox(
@@ -110,8 +135,11 @@ Column buildInterval(
     ),
     Text(
       "dominance".tr() +
-          NumberFormat("#0.00%").format(double.parse(item.marketCapDominance)),
-      style: TextStyle(fontSize: 16),
+          ((item.marketCapDominance == null)
+              ? " - "
+              : NumberFormat("#0.00%")
+                  .format(double.parse(item.marketCapDominance))),
+      style: defaultTextStyle,
     ),
     SizedBox(
       height: 10,

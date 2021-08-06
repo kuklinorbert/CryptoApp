@@ -32,8 +32,9 @@ TextStyle styleText(String number) {
   }
 }
 
-String formatLongNumber(String number) {
-  var formatLong = NumberFormat.compactLong();
+String formatLongNumber(String number, BuildContext context) {
+  var formatLong = NumberFormat.compactLong(
+      locale: Localizations.localeOf(context).languageCode);
   var formatNum = double.parse(number);
   return formatLong.format(formatNum);
 }
