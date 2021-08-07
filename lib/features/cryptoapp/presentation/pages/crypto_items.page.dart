@@ -42,7 +42,7 @@ class _CryptoItemsPageState extends State<CryptoItemsPage>
     List<Items> items = [];
 
     return GestureDetector(
-      onTap: () => FocusScope.of(context).unfocus(),
+      onTap: () => FocusManager.instance.primaryFocus.unfocus(),
       child: BlocListener<AuthBloc, AuthState>(
         bloc: widget.authBloc,
         listener: (context, state) {
@@ -57,6 +57,7 @@ class _CryptoItemsPageState extends State<CryptoItemsPage>
             child:
                 BlocConsumer<ItemsBloc, ItemsState>(listener: (context, state) {
               if (state is ErrorItems) {
+                widget.itemsBloc.isError = true;
                 ScaffoldMessenger.of(context)
                     .showSnackBar(buildSnackBar(context, state.message));
               }
@@ -69,6 +70,7 @@ class _CryptoItemsPageState extends State<CryptoItemsPage>
                 return Center(child: CircularProgressIndicator());
               } else if (state is LoadedItems) {
                 items = state.items;
+                widget.itemsBloc.isError = false;
                 widget.itemsBloc.isFetching = false;
               } else if (state is LoadedSearchItem) {
                 return Padding(
@@ -108,7 +110,7 @@ class _CryptoItemsPageState extends State<CryptoItemsPage>
                 },
                 child: Padding(
                   padding: const EdgeInsets.all(8),
-                  child: listViewSeparated(context, items),
+                  child: listViewSeparated(context, items, widget.itemsBloc),
                 ),
               );
             }),
@@ -118,7 +120,8 @@ class _CryptoItemsPageState extends State<CryptoItemsPage>
     );
   }
 
-  ListView listViewSeparated(BuildContext context, List<Items> items) {
+  ListView listViewSeparated(
+      BuildContext context, List<Items> items, ItemsBloc bloc) {
     return ListView.separated(
         controller: _scrollController
           ..addListener(() {
@@ -131,7 +134,28 @@ class _CryptoItemsPageState extends State<CryptoItemsPage>
           }),
         itemBuilder: (context, index) {
           return index >= items.length - 1
-              ? Center(child: CircularProgressIndicator())
+              ? (bloc.isError == false)
+                  ? Center(
+                      child: Padding(
+                      padding: const EdgeInsets.only(bottom: 15),
+                      child: CircularProgressIndicator(),
+                    ))
+                  : Center(
+                      child: Padding(
+                        padding: const EdgeInsets.only(bottom: 15),
+                        child: IconButton(
+                          icon: Icon(
+                            Icons.refresh,
+                            size: 35,
+                          ),
+                          onPressed: () {
+                            bloc.isError = false;
+                            BlocProvider.of<ItemsBloc>(context)
+                                .add(GetItemsEvent());
+                          },
+                        ),
+                      ),
+                    )
               : CryptoItem(items[index]);
         },
         separatorBuilder: (context, index) => const SizedBox(height: 10),

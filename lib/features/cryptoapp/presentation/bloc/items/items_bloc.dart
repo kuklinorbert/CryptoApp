@@ -23,6 +23,7 @@ class ItemsBloc extends Bloc<ItemsEvent, ItemsState> {
   final refresh.RefreshItems _refreshItems;
   int page = 1;
   bool isFetching = false;
+  bool isError = false;
   List<Items> itemList = [];
   String lastSearch;
 

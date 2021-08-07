@@ -12,6 +12,7 @@ class buildSwitchInterval extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print('lol');
     return Center(
       child: ToggleSwitch(
         totalSwitches: 5,

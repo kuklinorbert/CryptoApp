@@ -42,7 +42,8 @@ class _FavouritesPage1State extends State<FavouritesPage>
               if (previous is SwitchingFavouriteState &&
                       current is NotFavouriteState ||
                   previous is SwitchingFavouriteState &&
-                      current is YesFavouriteState) {
+                      current is YesFavouriteState ||
+                  current is ErrorFavouritesState) {
                 return true;
               } else {
                 return false;
@@ -97,7 +98,8 @@ class _FavouritesPage1State extends State<FavouritesPage>
                             itemCount: state.favourites.length),
                   );
                 }
-                if (state is ErrorFavouritesState) {
+                if (state is ErrorFavouritesState ||
+                    state is ErrorModifyingFavouritesState) {
                   return Center(
                     child: IconButton(
                       icon: Icon(

@@ -70,7 +70,6 @@ class FavouritesRepositoryImpl implements FavouritesRepository {
       String uid, String itemId) async {
     if (savedFav.favourites.isEmpty) {
       if (await networkInfo.isConnected) {
-        print('hahoo');
         try {
           final result = await favouritesDataSource.checkFavourites(uid);
           savedFav = result;

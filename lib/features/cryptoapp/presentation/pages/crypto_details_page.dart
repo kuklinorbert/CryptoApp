@@ -117,7 +117,6 @@ Column buildBody(Items item, BuildContext context, ConverterBloc converterBloc,
     bool convert, String currency) {
   String format;
 
-  print(item.firstOrderBook);
   ChartBloc chartBloc = sl<ChartBloc>();
   IntervalBloc intervalBloc = sl<IntervalBloc>();
   DateTime today = new DateTime.now();
