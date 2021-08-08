@@ -5,6 +5,7 @@ import 'package:cryptoapp/features/cryptoapp/presentation/bloc/navigationbar/nav
 import 'package:cryptoapp/features/cryptoapp/presentation/pages/crypto_items.page.dart';
 import 'package:cryptoapp/features/cryptoapp/presentation/pages/events_page.dart';
 import 'package:cryptoapp/features/cryptoapp/presentation/pages/favourites_page.dart';
+import 'package:cryptoapp/features/cryptoapp/presentation/widgets/navbar.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -128,7 +129,6 @@ class _MainPageState extends State<MainPage> {
               onPageChanged: (index) {
                 if (index == 0) navbarBloc.add(HomeSelected());
                 if (index == 1) navbarBloc.add(FavouritesSelected());
-
                 if (index == 2) navbarBloc.add(EventsSelected());
               },
               children: [
@@ -149,56 +149,16 @@ class _MainPageState extends State<MainPage> {
           bloc: navbarBloc,
           builder: (context, state) {
             if (state is NavigationbarHome || state is NavigationbarInitial) {
-              return buildNavBar(
-                  navbarBloc: navbarBloc,
-                  index: 0,
-                  favouritesBloc: favouritesBloc);
+              return buildNavbar(navbarBloc, 0);
             }
             if (state is NavigationbarFavourites) {
-              return buildNavBar(
-                  navbarBloc: navbarBloc,
-                  index: 1,
-                  favouritesBloc: favouritesBloc);
+              return buildNavbar(navbarBloc, 1);
             }
             if (state is NavigationbarEvents) {
-              return buildNavBar(
-                  navbarBloc: navbarBloc,
-                  index: 2,
-                  favouritesBloc: favouritesBloc);
+              return buildNavbar(navbarBloc, 2);
             }
             return Container();
           },
         ));
-  }
-}
-
-class buildNavBar extends StatelessWidget {
-  const buildNavBar({
-    Key key,
-    @required this.navbarBloc,
-    @required this.index,
-    @required this.favouritesBloc,
-  }) : super(key: key);
-
-  final NavigationbarBloc navbarBloc;
-  final int index;
-  final FavouritesBloc favouritesBloc;
-
-  @override
-  Widget build(BuildContext context) {
-    return BottomNavigationBar(
-      currentIndex: index,
-      onTap: (index) {
-        if (index == 0) navbarBloc.add(HomeSelected());
-        if (index == 1) navbarBloc.add(FavouritesSelected());
-        if (index == 2) navbarBloc.add(EventsSelected());
-      },
-      items: [
-        BottomNavigationBarItem(icon: Icon(Icons.home), label: 'home'.tr()),
-        BottomNavigationBarItem(
-            icon: Icon(Icons.favorite), label: 'favourites'.tr()),
-        BottomNavigationBarItem(icon: Icon(Icons.feed), label: 'events'.tr()),
-      ],
-    );
   }
 }

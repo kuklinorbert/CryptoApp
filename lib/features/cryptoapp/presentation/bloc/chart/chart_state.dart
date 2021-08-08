@@ -9,8 +9,6 @@ abstract class ChartState extends Equatable {
 
 class ChartInitial extends ChartState {}
 
-class ChartLoadingState extends ChartState {}
-
 class ChartLoadedState extends ChartState {
   final List<Chart> chart;
 

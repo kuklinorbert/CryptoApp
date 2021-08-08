@@ -1,5 +1,4 @@
 import 'package:cryptoapp/core/error/exceptions.dart';
-import 'package:cryptoapp/core/error/failures.dart';
 import 'package:cryptoapp/features/cryptoapp/data/models/chart_model.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
@@ -29,7 +28,7 @@ class ChartDataSourceImpl implements ChartDataSource {
     final uri = Uri.parse(url);
     final response =
         await client.get(uri, headers: {'Content-Type': 'application/json'});
-    //429
+
     if (response.statusCode == 200) {
       return chartModelFromJson(response.body);
     } else if (response.statusCode == 429) {

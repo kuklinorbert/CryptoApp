@@ -26,7 +26,7 @@ Padding searchBar(List<Items> items, BuildContext context,
                           BlocProvider.of<ItemsBloc>(context)
                             ..add(CancelSearchEvent());
                           Future.delayed(Duration.zero, () {
-                            FocusScope.of(context).unfocus();
+                            FocusManager.instance.primaryFocus.unfocus();
                           });
                         },
                         icon: Icon(Icons.cancel, color: Colors.grey)),

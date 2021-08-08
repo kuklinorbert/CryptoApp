@@ -161,7 +161,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
   Stream<AuthEvent> resendCode() async* {
     StreamController<AuthEvent> eventStream = StreamController();
-    final phoneVerificationCompleted = (AuthCredential authCredential) {
+    final phoneVerificationCompleted = (AuthCredential authCredential) async {
+      await FirebaseAuth.instance.signInWithCredential(authCredential);
       eventStream.add(AuthenticatedEvent());
       eventStream.close();
     };

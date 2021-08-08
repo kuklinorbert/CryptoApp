@@ -11,8 +11,6 @@ class AuthInitial extends AuthState {}
 
 class CheckAuthState extends AuthState {}
 
-class CheckingLoginState extends AuthState {}
-
 class Authenticated extends AuthState {}
 
 class Unauthenticated extends AuthState {}
@@ -38,9 +36,3 @@ class VerifyErrorState extends AuthState {
 class CodeSentState extends AuthState {}
 
 class LoadingState extends AuthState {}
-
-class CodeVerifiedState extends AuthState {}
-
-class LoginSuccesfulState extends AuthState {}
-
-class NoResendLeftState extends AuthState {}

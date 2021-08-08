@@ -29,9 +29,13 @@ BlocListener<ChartBloc, ChartState> buildChart(
               interval: chartInterval.toUtc().toIso8601String(),
               convert: convert)),
         builder: (context, state) {
-          if (state is ChartLoadingState) {
-            return Center(
-              child: CircularProgressIndicator(),
+          if (state is ChartInitial) {
+            return SizedBox(
+              width: MediaQuery.of(context).size.width,
+              height: MediaQuery.of(context).size.height * 0.4,
+              child: Center(
+                child: CircularProgressIndicator(),
+              ),
             );
           } else if (state is ChartLoadedState) {
             if (state.chart.isNotEmpty) {
@@ -94,7 +98,14 @@ BlocListener<ChartBloc, ChartState> buildChart(
                                           color: Color.fromRGBO(0, 0, 132, 1)),
                                       children: [
                                         TextSpan(
-                                            text: flSpot.y.toStringAsFixed(3) +
+                                            text: ((flSpot.y <= 0.005)
+                                                    ? (flSpot.y <= 0.00005)
+                                                        ? flSpot.y
+                                                            .toStringAsFixed(7)
+                                                        : flSpot.y
+                                                            .toStringAsFixed(5)
+                                                    : flSpot.y
+                                                        .toStringAsFixed(3)) +
                                                 currency)
                                       ]);
                                 }).toList();

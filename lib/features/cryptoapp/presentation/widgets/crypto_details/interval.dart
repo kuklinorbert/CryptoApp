@@ -3,7 +3,7 @@ import 'package:cryptoapp/features/cryptoapp/domain/entities/items_interval.dart
 import 'package:cryptoapp/features/cryptoapp/presentation/bloc/chart/chart_bloc.dart';
 import 'package:cryptoapp/features/cryptoapp/presentation/bloc/converter/converter_bloc.dart';
 import 'package:cryptoapp/features/cryptoapp/presentation/bloc/interval/interval_bloc.dart';
-import 'package:cryptoapp/features/cryptoapp/presentation/widgets/build_chart.dart';
+import 'package:cryptoapp/features/cryptoapp/presentation/widgets/crypto_details/chart.dart';
 import 'package:cryptoapp/features/cryptoapp/presentation/widgets/formatters.dart';
 import 'package:cryptoapp/features/cryptoapp/presentation/widgets/toggle_switch_currencies.dart';
 import 'package:cryptoapp/features/cryptoapp/presentation/widgets/toggle_switch_intervals.dart';
@@ -60,14 +60,14 @@ Column buildInterval(
     SizedBox(
       height: 15,
     ),
-    buildSwitchInterval(intervalBloc: intervalBloc),
+    buildSwitchInterval(intervalBloc),
     SizedBox(
       height: 25,
     ),
     buildSwitchCurrencies(
-      converterBloc: converterBloc,
-      itemId: item.id.toString(),
-      switchNum: convert,
+      converterBloc,
+      item.id.toString(),
+      convert,
     ),
     SizedBox(
       height: 10,

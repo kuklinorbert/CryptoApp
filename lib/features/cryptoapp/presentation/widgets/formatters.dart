@@ -13,13 +13,27 @@ String formatPercentage(String number) {
 }
 
 String formatNumber(String number) {
-  var numberPlus = NumberFormat("+#0.000");
-  var numberMinus = NumberFormat("#0.000");
+  var numberPlus3 = NumberFormat("+#0.000");
+  var numberMinus3 = NumberFormat("#0.000");
+  var numberPlus5 = NumberFormat("+#0.000##");
+  var numberMinus5 = NumberFormat("#0.000##");
+  var numberPlus7 = NumberFormat("+#0.000####");
+  var numberMinus7 = NumberFormat("#0.000####");
+
   var formatNum = double.parse(number);
+
   if (formatNum >= 0) {
-    return numberPlus.format(formatNum);
+    return ((formatNum <= 0.005)
+        ? (formatNum <= 0.00005)
+            ? numberPlus7.format(formatNum)
+            : numberPlus5.format(formatNum)
+        : numberPlus3.format(formatNum));
   } else {
-    return numberMinus.format(formatNum);
+    return ((formatNum >= -0.005)
+        ? (formatNum >= -0.00005)
+            ? numberMinus7.format(formatNum)
+            : numberMinus5.format(formatNum)
+        : numberMinus3.format(formatNum));
   }
 }
 

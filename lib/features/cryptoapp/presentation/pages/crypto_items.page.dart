@@ -2,6 +2,7 @@ import 'package:cryptoapp/features/cryptoapp/domain/entities/items.dart';
 import 'package:cryptoapp/features/cryptoapp/presentation/bloc/auth/auth_bloc.dart';
 import 'package:cryptoapp/features/cryptoapp/presentation/bloc/items/items_bloc.dart';
 import 'package:cryptoapp/features/cryptoapp/presentation/widgets/crypto_item.dart';
+import 'package:cryptoapp/features/cryptoapp/presentation/widgets/list_view.dart';
 import 'package:cryptoapp/features/cryptoapp/presentation/widgets/searchBar.dart';
 import 'package:cryptoapp/features/cryptoapp/presentation/widgets/show_snackbar.dart';
 import 'package:flutter/material.dart';
@@ -22,7 +23,6 @@ class CryptoItemsPage extends StatefulWidget {
 class _CryptoItemsPageState extends State<CryptoItemsPage>
     with AutomaticKeepAliveClientMixin {
   final TextEditingController textController = TextEditingController();
-  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
@@ -118,47 +118,5 @@ class _CryptoItemsPageState extends State<CryptoItemsPage>
         ]),
       ),
     );
-  }
-
-  ListView listViewSeparated(
-      BuildContext context, List<Items> items, ItemsBloc bloc) {
-    return ListView.separated(
-        controller: _scrollController
-          ..addListener(() {
-            if (_scrollController.offset ==
-                    _scrollController.position.maxScrollExtent &&
-                !widget.itemsBloc.isFetching) {
-              BlocProvider.of<ItemsBloc>(context).add(GetItemsEvent());
-              widget.itemsBloc.isFetching = true;
-            }
-          }),
-        itemBuilder: (context, index) {
-          return index >= items.length - 1
-              ? (bloc.isError == false)
-                  ? Center(
-                      child: Padding(
-                      padding: const EdgeInsets.only(bottom: 15),
-                      child: CircularProgressIndicator(),
-                    ))
-                  : Center(
-                      child: Padding(
-                        padding: const EdgeInsets.only(bottom: 15),
-                        child: IconButton(
-                          icon: Icon(
-                            Icons.refresh,
-                            size: 35,
-                          ),
-                          onPressed: () {
-                            bloc.isError = false;
-                            BlocProvider.of<ItemsBloc>(context)
-                                .add(GetItemsEvent());
-                          },
-                        ),
-                      ),
-                    )
-              : CryptoItem(items[index]);
-        },
-        separatorBuilder: (context, index) => const SizedBox(height: 10),
-        itemCount: items.length);
   }
 }

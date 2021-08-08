@@ -20,6 +20,7 @@ class EventsDataSourceImpl implements EventsDataSource {
     final url = Uri.parse(uri);
     final response =
         await client.get(url, headers: {'Content-Type': 'application/json'});
+
     if (response.statusCode == 200) {
       return eventsModelFromJson(response.body);
     } else {

@@ -9,6 +9,7 @@ class CryptoItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final price = double.parse(item.price);
     String format;
     if (item.logoUrl.isNotEmpty) {
       format = item.logoUrl.substring(item.logoUrl.length - 3);
@@ -68,7 +69,12 @@ class CryptoItem extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.only(right: 15.0),
                 child: Text(
-                  num.parse(item.price).toStringAsFixed(3) + " \$",
+                  ((price <= 0.005)
+                          ? (price <= 0.00005)
+                              ? price.toStringAsFixed(7)
+                              : price.toStringAsFixed(5)
+                          : price.toStringAsFixed(3)) +
+                      " \$",
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
                 ),
               ),

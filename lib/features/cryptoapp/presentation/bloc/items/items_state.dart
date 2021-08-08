@@ -57,5 +57,3 @@ class LoadedSearchItem extends ItemsState {
   @override
   List<Object> get props => [searchedItem];
 }
-
-class NoItemFound extends ItemsState {}

@@ -31,6 +31,7 @@ class FavouritesDataSourceImpl implements FavouritesDataSource {
     final url = Uri.parse(uri);
     final response =
         await client.get(url, headers: {'Content-Type': 'application/json'});
+
     if (response.statusCode == 200) {
       if (response.body == "null") {
         return empty;

@@ -50,8 +50,6 @@ class _FavouritesPage1State extends State<FavouritesPage>
               }
             },
             listener: (context, state) {
-              print("favourites listener: " + state.toString());
-
               if (state is YesFavouriteState || state is NotFavouriteState) {
                 widget.favouritesBloc.add(GetFavouritesEvent(uid: userId));
               }
@@ -72,7 +70,6 @@ class _FavouritesPage1State extends State<FavouritesPage>
                 }
               },
               builder: (context, state) {
-                print("favourites builder: " + state.toString());
                 if (state is LoadingFavouritesState) {
                   return Center(
                     child: CircularProgressIndicator(),
