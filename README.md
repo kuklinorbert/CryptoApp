@@ -1,5 +1,7 @@
 # CryptoApp
 
+<img src="assets/icon/cryptoapp.png" height="150">
+
 A CrytoApp projektet nyáron készítettem, a feladatot az ICB Tech gyakorló feladatként, továbbtanulási lehetőségként bízta rám, amit leadás után át is néztek.
 
 A cél egy Flutter alkalmazás elkészítése volt amivel kriptovalutákat követhetjük. A kriptovaluta adatokhoz a Nomics API volt használva - https://nomics.com/docs/ , a közelgő eseményekhez pedig a Coin Gecko API - https://api.coingecko.com/api/v3/events?upcoming_events_only=true
